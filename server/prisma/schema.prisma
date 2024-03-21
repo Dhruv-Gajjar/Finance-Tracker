@@ -14,19 +14,23 @@ datasource db {
 }
 
 model Users {
-  id       Int    @id @default(autoincrement())
-  username String @unique
-  password String
-  email    String @unique
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }
 
 model Expenses {
-  id          Int          @id @default(autoincrement())
+  id          String       @id @default(uuid())
   title       String
   type        ExpenseTypes
   description String
   amount      Float
   date        DateTime     @default(now())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now())
 }
 
 enum ExpenseTypes {
