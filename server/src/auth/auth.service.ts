@@ -45,7 +45,7 @@ export class AuthService {
   async login(userDto: Prisma.UsersCreateInput, pass: string): Promise<any> {
     const user = await this.prismaService.users.findUnique({
       where: {
-        email: userDto.email,
+        username: userDto.username,
       },
     });
 
@@ -71,5 +71,3 @@ export class AuthService {
     return await this.jwtService.signAsync(payload);
   }
 }
-
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJ0ZXN0IiwiaWF0IjoxNzExMDMyMTc1LCJleHAiOjE3MTEwMzU3NzV9.B3NMSYcWknqy61rwJigImlTV13wTl63rRIQ_mccPsko
