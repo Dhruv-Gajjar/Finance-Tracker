@@ -1,9 +1,7 @@
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   timeout: 10000,
 });
 
@@ -17,14 +15,11 @@ export const get = async (url: string, params?: string | object) => {
 };
 
 export const post = async (url: string, data: any) => {
-  console.log("AAAAA", url, data);
   try {
     const response = await axiosInstance.post(url, data);
     return response.data;
-  } catch (error) {
-    toast.error(`${error}`, {
-      position: "top-left",
-    });
+  } catch (error: any) {
+    return error;
   }
 };
 

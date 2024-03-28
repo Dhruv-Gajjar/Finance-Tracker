@@ -1,6 +1,13 @@
 "use client";
+import { useToast } from "@/components/ui/use-toast";
+import { get, post } from "@/utils/axiosService";
 import { IAuthForm } from "@/utils/types";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // shadcn ui
 import { Button } from "@/components/ui/button";
@@ -14,15 +21,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// import { get, post } from "@/utils/axiosService";
-import { post } from "@/utils/axiosService";
-import axios from "axios";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { toast } from "react-toastify";
 
 const AuthForm = (props: { title: string }) => {
+  const { toast } = useToast();
   const [token, setToken] = useState<string>("");
   const router = useRouter();
   const { title } = props;
@@ -37,30 +38,50 @@ const AuthForm = (props: { title: string }) => {
     try {
       if (title === "Login") {
         const loginData = await post("/auth/login", data);
-        console.log("LoginData: ", loginData);
-        setToken(loginData.accessToken);
-        localStorage.setItem("token", loginData.accessToken);
-        console.log("ACCES_TOKEN: ", token);
-        toast.success("Logged in succesfully!", {
-          position: "top-left",
-        });
-        router.push("/");
+        if (loginData?.status !== 200) {
+          toast({
+            variant: "destructive",
+            title: loginData?.response?.data?.message,
+          });
+        } else {
+          console.log("LoginData: ", loginData);
+          setToken(loginData?.token);
+          localStorage.setItem("token", loginData?.token);
+          console.log("ACCES_TOKEN: ", token);
+          toast({
+            variant: "default",
+            title: "Logged in successfully!.",
+            className: "bg-green-600",
+          });
+          router.push("/");
+        }
       } else {
         const signupData = await post("/auth/register", data);
-        toast.success(signupData.Data, {
-          position: "top-left",
-        });
-        router.push("/");
+        console.log("SignupData: ", signupData);
+        if (signupData.response.status !== 200) {
+          toast({
+            variant: "destructive",
+            title: signupData.response.data?.message,
+            // description: "There was a problem with your request.",
+            // action: <ToastAction altText="Try again">Try again</ToastAction>,
+          });
+        } else {
+          toast({
+            variant: "default",
+            title: "Logged in successfully!.",
+            className: "bg-green-600",
+          });
+          router.push("/");
+        }
       }
     } catch (error: any) {
-      toast.error(error, {
-        position: "top-left",
-      });
+      console.log("error", error);
     }
   };
 
   return (
     <div>
+      <ToastContainer autoClose={2000} />
       <Card className="w-[350px]">
         <CardHeader>
           <CardTitle>{title}</CardTitle>
@@ -106,7 +127,7 @@ const AuthForm = (props: { title: string }) => {
                   type="password"
                   {...register("password", { required: true })}
                 />
-                {errors.email?.type === "required" && (
+                {errors.password?.type === "required" && (
                   <p className="text-red-400">Password is required</p>
                 )}
               </div>
