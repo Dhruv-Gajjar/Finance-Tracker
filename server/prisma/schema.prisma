@@ -13,32 +13,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
-  id        String   @id @default(uuid())
-  username  String   @unique
+model User {
+  id        Int        @id @default(autoincrement())
+  username  String     @unique
   password  String
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  email     String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now())
+  expenses  Expenses[]
 }
 
 model Expenses {
-  id          String       @id @default(uuid())
+  id          Int          @id @default(autoincrement())
   title       String
   type        ExpenseTypes
   description String
   amount      Float
-  date        DateTime     @default(now())
+  date        String
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @default(now())
+  user        User         @relation(fields: [userId], references: [id])
+  userId      Int
 }
 
 enum ExpenseTypes {
-  Salary
-  Bills
-  Grocery
-  Emi
-  Rent
-  Subscriptions
-  Insurances
+  salary
+  bill
+  grocery
+  emi
+  rent
+  subscribtion
+  insurance
+  food
 }

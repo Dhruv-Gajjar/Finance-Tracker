@@ -13,7 +13,7 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async getUserById(@Param('id') id: string) {
-    return await this.userService.findOne(id);
+  async getUserById(@Param('id') id: number) {
+    return await this.userService.findOne(+id);
   }
 }

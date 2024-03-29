@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
 
 @Injectable()
@@ -7,13 +6,16 @@ export class UsersService {
   constructor(private prismaService: PrismaService) {}
 
   async findAllUsers() {
-    return this.prismaService.users.findMany();
+    return this.prismaService.user.findMany();
   }
 
-  async findOne(id: string) {
-    const user = await this.prismaService.users.findUnique({
+  async findOne(id: number) {
+    const user = await this.prismaService.user.findUnique({
       where: {
         id,
+      },
+      include: {
+        expenses: true,
       },
     });
     console.log('SingleUser: ', user);

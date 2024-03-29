@@ -8,13 +8,13 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Body() userDto: Prisma.UsersCreateInput) {
+  async login(@Body() userDto: Prisma.UserCreateInput) {
     return await this.authService.login(userDto, userDto.password);
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('register')
-  async register(@Body() userDto: Prisma.UsersCreateInput) {
+  async register(@Body() userDto: Prisma.UserCreateInput) {
     return await this.authService.register(userDto);
   }
 }

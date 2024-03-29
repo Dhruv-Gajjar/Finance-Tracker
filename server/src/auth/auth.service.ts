@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -16,8 +15,8 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register(userDto: Prisma.UsersCreateInput) {
-    const foundUser = await this.prismaService.users.findUnique({
+  async register(userDto: Prisma.UserCreateInput) {
+    const foundUser = await this.prismaService.user.findUnique({
       where: {
         email: userDto.email,
       },
@@ -29,7 +28,7 @@ export class AuthService {
 
     const hashedPassword = await hashPassword(userDto.password);
 
-    await this.prismaService.users.create({
+    await this.prismaService.user.create({
       data: {
         email: userDto.email,
         password: hashedPassword,
@@ -38,36 +37,49 @@ export class AuthService {
     });
 
     return {
+      status: 200,
       message: 'User created sucessfully',
+      response: {
+        email: userDto.email,
+        username: userDto.username,
+      },
     };
   }
 
-  async login(userDto: Prisma.UsersCreateInput, pass: string): Promise<any> {
-    const user = await this.prismaService.users.findUnique({
+  async login(userDto: Prisma.UserCreateInput, pass: string): Promise<any> {
+    const user = await this.prismaService.user.findUnique({
       where: {
         username: userDto.username,
       },
     });
 
     if (!user) {
-      throw new NotFoundException('User Not Found');
+      throw new BadRequestException('User not found', {
+        cause: new Error(),
+        description: 'User not found',
+      });
     }
 
     const isMatchPassword = await comparePassword(pass, user.password);
 
     if (!isMatchPassword) {
-      throw new UnauthorizedException('Invalid password');
+      throw new UnauthorizedException('Invalid password, Try again.');
     }
 
     const payload = { id: user.id, username: user.username };
     const token = await this.signJwtToken(payload);
-    console.log('JwtToken: ', token);
     return {
-      accessToken: token,
+      status: 200,
+      message: 'Logged in sucessfully',
+      response: {
+        token,
+        email: user?.email,
+        username: user?.username,
+      },
     };
   }
 
-  async signJwtToken(payload: { id: string; username: string }) {
+  async signJwtToken(payload: { id: number; username: string }) {
     return await this.jwtService.signAsync(payload);
   }
 }
