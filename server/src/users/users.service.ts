@@ -9,16 +9,31 @@ export class UsersService {
     return this.prismaService.user.findMany();
   }
 
-  async findOne(id: number) {
+  async findOne(userId: number) {
     const user = await this.prismaService.user.findUnique({
       where: {
-        id,
+        id: userId,
       },
       include: {
-        expenses: true,
+        expenses: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
-    console.log('SingleUser: ', user);
-    return user;
+
+    const { id, email, expenses, username } = user;
+
+    return {
+      status: 200,
+      message: 'Success',
+      response: {
+        id,
+        email,
+        username,
+        expenses,
+      },
+    };
   }
 }

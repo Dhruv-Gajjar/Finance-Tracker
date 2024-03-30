@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
-import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ExpensesService {
@@ -10,13 +9,6 @@ export class ExpensesService {
   async create(createExpenseDto: Prisma.ExpensesCreateInput) {
     return this.prismaService.expenses.create({
       data: createExpenseDto,
-      include: {
-        user: {
-          select: {
-            id: true,
-          },
-        },
-      },
     });
   }
 
