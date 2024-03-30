@@ -21,8 +21,10 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import useAuth from "@/context/AuthContext";
 
 const AuthForm = (props: { title: string }) => {
+  const { login, signUp, user } = useAuth();
   const { toast } = useToast();
   const [token, setToken] = useState<string>("");
   const router = useRouter();
@@ -34,45 +36,53 @@ const AuthForm = (props: { title: string }) => {
     formState: { errors },
   } = useForm<IAuthForm>();
 
-  const onSubmit: SubmitHandler<IAuthForm> = async (data) => {
+  const onSubmit: SubmitHandler<IAuthForm> = async (formData) => {
     try {
       if (title === "Login") {
-        const loginData = await post("/auth/login", data);
-        if (loginData?.status !== 200) {
-          toast({
-            variant: "destructive",
-            title: loginData?.response?.data?.message,
-          });
-        } else {
-          console.log("LoginData: ", loginData);
-          setToken(loginData?.token);
-          localStorage.setItem("token", loginData?.token);
-          console.log("ACCES_TOKEN: ", token);
-          toast({
-            variant: "default",
-            title: "Logged in successfully!.",
-            className: "bg-green-600",
-          });
-          router.push("/");
-        }
+        login(formData);
+        // const loginData = await post("/auth/login", data);
+        // if (loginData?.status !== 200) {
+        //   toast({
+        //     variant: "destructive",
+        //     title: loginData?.response?.data?.message,
+        //   });
+        // } else {
+        //   console.log("LoginData: ", loginData);
+        //   setToken(loginData?.token);
+        //   localStorage.setItem("token", loginData?.token);
+        //   console.log("ACCES_TOKEN: ", token);
+        //   toast({
+        //     variant: "default",
+        //     title: "Logged in successfully!.",
+        //     className: "bg-green-600",
+        //   });
+        router.push("/");
+        // }
       } else {
-        const signupData = await post("/auth/register", data);
-        console.log("SignupData: ", signupData);
-        if (signupData.response.status !== 200) {
-          toast({
-            variant: "destructive",
-            title: signupData.response.data?.message,
-            // description: "There was a problem with your request.",
-            // action: <ToastAction altText="Try again">Try again</ToastAction>,
-          });
-        } else {
-          toast({
-            variant: "default",
-            title: "Logged in successfully!.",
-            className: "bg-green-600",
-          });
-          router.push("/");
-        }
+        signUp(formData);
+        toast({
+          value: "default",
+          title: "User created succesfully!",
+          className: "bg-green-600",
+        });
+        router.push("/login");
+        // const signupData = await post("/auth/register", data);
+        // console.log("SignupData: ", signupData);
+        // if (signupData.response.status !== 200) {
+        //   toast({
+        //     variant: "destructive",
+        //     title: signupData.response.data?.message,
+        //     // description: "There was a problem with your request.",
+        //     // action: <ToastAction altText="Try again">Try again</ToastAction>,
+        //   });
+        // } else {
+        //   toast({
+        //     variant: "default",
+        //     title: "Logged in successfully!.",
+        //     className: "bg-green-600",
+        //   });
+        //   router.push("/");
+        // }
       }
     } catch (error: any) {
       console.log("error", error);

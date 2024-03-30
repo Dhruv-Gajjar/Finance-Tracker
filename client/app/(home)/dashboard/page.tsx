@@ -1,10 +1,13 @@
+"use client";
 import { DataTable } from "@/components/DataTable/DataTabe";
 import TotalAmount from "@/components/TotalAmount";
-import React from "react";
+import React, { useEffect } from "react";
 
 import { Payment, columns } from "@/components/DataTable/columns";
 import { ExpenseFormModal } from "@/components/ExpenseFormModal/ExpenseFormModal";
 import { Button } from "@/components/ui/button";
+import useAuth from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 async function getData(): Promise<Payment[]> {
   // Fetch data from your API here.
@@ -42,8 +45,17 @@ async function getData(): Promise<Payment[]> {
   ];
 }
 
-const Dashboard = async () => {
-  const data = await getData();
+const Dashboard = () => {
+  const { user, token } = useAuth();
+  const router = useRouter();
+  const data = getData();
+
+  useEffect(() => {
+    if (user === null && token === "") {
+      router.push("/login");
+    }
+    console.log("users: ", user);
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-between w-[100%] p-8 bg-gray-200 dark:bg-zinc-900">
@@ -65,7 +77,7 @@ const Dashboard = async () => {
       </div>
       <div>Chart will go here...</div>
       <div className="w-full h-full">
-        <DataTable columns={columns} data={data} />
+        {/* <DataTable columns={columns} data={data} /> */}
       </div>
     </div>
   );
