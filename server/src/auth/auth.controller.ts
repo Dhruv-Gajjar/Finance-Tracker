@@ -1,6 +1,15 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { AuthService } from './auth.service';
+import { RefreshJwtGuard } from './guards/refresh-jwt-auth';
 
 @Controller('auth')
 export class AuthController {
@@ -16,5 +25,11 @@ export class AuthController {
   @Post('register')
   async register(@Body() userDto: Prisma.UserCreateInput) {
     return await this.authService.register(userDto);
+  }
+
+  @UseGuards(RefreshJwtGuard)
+  @Post('refresh')
+  async refreshToken(@Request() req) {
+    return await this.authService.refreshToken(req.user);
   }
 }

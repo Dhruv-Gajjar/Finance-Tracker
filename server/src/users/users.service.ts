@@ -15,11 +15,7 @@ export class UsersService {
         id: userId,
       },
       include: {
-        expenses: {
-          select: {
-            id: true,
-          },
-        },
+        expenses: true,
       },
     });
 

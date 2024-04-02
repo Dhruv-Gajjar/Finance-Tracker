@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
 import { comparePassword, hashPassword } from 'src/utils/helpers';
 
@@ -66,16 +66,35 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password, Try again.');
     }
 
-    const payload = { id: user.id, username: user.username };
-    const token = await this.signJwtToken(payload);
+    const payload = {
+      username: user.email,
+      sub: { id: user.id },
+    };
+    const token = this.jwtService.sign(payload);
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: '60d',
+    });
     return {
       status: 200,
       message: 'Logged in sucessfully',
       response: {
         token,
+        refreshToken,
         email: user?.email,
         username: user?.username,
+        id: user?.id,
       },
+    };
+  }
+
+  async refreshToken(user: User) {
+    const payload = {
+      username: user.email,
+      sub: { id: user.id },
+    };
+
+    return {
+      access_token: this.jwtService.sign(payload),
     };
   }
 
