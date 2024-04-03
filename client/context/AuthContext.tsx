@@ -1,11 +1,13 @@
 "use client";
 import { toast } from "@/components/ui/use-toast";
 import { get, post } from "@/utils/axiosService";
+import { checkTokenExpiration } from "@/utils/checkTokenExpiration";
 import {
   Dispatch,
   SetStateAction,
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -30,7 +32,22 @@ export const AuthContext = createContext<IAuthContext | null>(null);
 export const AuthContextProvider = (props: { children: any }) => {
   const { children } = props;
   const [user, setUser] = useState<IUser | null>(null);
-  const [token, setToken] = useState<string>("");
+  const [token, setToken] = useState<string>(
+    typeof window !== "undefined" ? localStorage.getItem("token") || "" : ""
+  );
+  // const [isTokenExpired, setIsTokenExpired] = useState<boolean>(false);
+  useEffect(() => {
+    if (token) {
+      getUser();
+    }
+  }, []);
+
+  useEffect(() => {
+    const tokenExpired = checkTokenExpiration(token);
+    if (tokenExpired) {
+      refreshToken();
+    }
+  }, [token]);
 
   const login = async (data: IUser): Promise<void> => {
     const loginData = await post("/auth/login", data);
@@ -40,9 +57,16 @@ export const AuthContextProvider = (props: { children: any }) => {
         title: loginData?.response?.data?.message,
       });
     } else {
+      const userObj = {
+        userId: loginData?.response?.id,
+        username: loginData?.response?.username,
+        email: loginData?.response?.email,
+      };
       setUser(loginData?.response);
       setToken(loginData?.response?.token);
       localStorage.setItem("token", loginData?.response?.token);
+      localStorage.setItem("refreshToken", loginData?.response?.refreshToken);
+      localStorage.setItem("user", JSON.stringify(userObj));
     }
   };
 
@@ -55,6 +79,50 @@ export const AuthContextProvider = (props: { children: any }) => {
       });
     } else {
       return signUpData;
+    }
+  };
+
+  const getUser = async () => {
+    const userString = localStorage.getItem("user");
+    let user = null;
+
+    if (userString !== null) {
+      user = JSON.parse(userString);
+    }
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    const userData = await get(`users/${user?.userId}`, config);
+    if (userData?.status === 200) {
+      setUser(userData?.response);
+    } else {
+      toast({
+        title: "User not found",
+        className: "bg-reg-600",
+      });
+    }
+  };
+
+  const refreshToken = async () => {
+    const tempRefreshToken = localStorage.getItem("refreshToken");
+    if (tempRefreshToken) {
+      const refreshTokenData = await post("auth/refresh", {
+        refresh: tempRefreshToken,
+      });
+      if (refreshTokenData.status === 200) {
+        localStorage.removeItem("token");
+        setToken(refreshTokenData?.access_token);
+        localStorage.setItem("token", refreshTokenData?.access_token);
+        toast({
+          title: refreshTokenData?.message,
+          className: "bg-green-600",
+        });
+      } else {
+        toast({
+          title: "Fail to refresh Token",
+          className: "bg-reg-600",
+        });
+      }
     }
   };
 

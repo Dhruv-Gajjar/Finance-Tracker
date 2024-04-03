@@ -40,24 +40,7 @@ const AuthForm = (props: { title: string }) => {
     try {
       if (title === "Login") {
         login(formData);
-        // const loginData = await post("/auth/login", data);
-        // if (loginData?.status !== 200) {
-        //   toast({
-        //     variant: "destructive",
-        //     title: loginData?.response?.data?.message,
-        //   });
-        // } else {
-        //   console.log("LoginData: ", loginData);
-        //   setToken(loginData?.token);
-        //   localStorage.setItem("token", loginData?.token);
-        //   console.log("ACCES_TOKEN: ", token);
-        //   toast({
-        //     variant: "default",
-        //     title: "Logged in successfully!.",
-        //     className: "bg-green-600",
-        //   });
         router.push("/");
-        // }
       } else {
         signUp(formData);
         toast({
@@ -66,23 +49,6 @@ const AuthForm = (props: { title: string }) => {
           className: "bg-green-600",
         });
         router.push("/login");
-        // const signupData = await post("/auth/register", data);
-        // console.log("SignupData: ", signupData);
-        // if (signupData.response.status !== 200) {
-        //   toast({
-        //     variant: "destructive",
-        //     title: signupData.response.data?.message,
-        //     // description: "There was a problem with your request.",
-        //     // action: <ToastAction altText="Try again">Try again</ToastAction>,
-        //   });
-        // } else {
-        //   toast({
-        //     variant: "default",
-        //     title: "Logged in successfully!.",
-        //     className: "bg-green-600",
-        //   });
-        //   router.push("/");
-        // }
       }
     } catch (error: any) {
       console.log("error", error);
