@@ -94,6 +94,8 @@ export class AuthService {
     };
 
     return {
+      status: 200,
+      message: 'Token refreshed succesfully',
       access_token: this.jwtService.sign(payload),
     };
   }
