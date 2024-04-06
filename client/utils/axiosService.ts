@@ -20,7 +20,7 @@ export const post = async (
   config?: AxiosRequestConfig
 ) => {
   try {
-    const response = await axiosInstance.post(url, data);
+    const response = await axiosInstance.post(url, data, config);
     return response.data;
   } catch (error: any) {
     return error;
@@ -33,7 +33,7 @@ export const deleteData = async (
   config?: AxiosRequestConfig
 ) => {
   try {
-    const response = await axiosInstance.delete(url, data);
+    const response = await axiosInstance.delete(url, config);
     return response.data;
   } catch (error) {
     console.log("Delete error: ", error);

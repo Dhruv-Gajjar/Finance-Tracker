@@ -1,13 +1,8 @@
 "use client";
-import { useToast } from "@/components/ui/use-toast";
-import { get, post } from "@/utils/axiosService";
 import { IAuthForm } from "@/utils/types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 // shadcn ui
 import { Button } from "@/components/ui/button";
@@ -21,18 +16,17 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
 import useAuth from "@/context/AuthContext";
 
 const AuthForm = (props: { title: string }) => {
-  const { login, signUp, user } = useAuth();
+  const { login, signUp } = useAuth();
   const { toast } = useToast();
-  const [token, setToken] = useState<string>("");
   const router = useRouter();
   const { title } = props;
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<IAuthForm>();
 
@@ -57,7 +51,6 @@ const AuthForm = (props: { title: string }) => {
 
   return (
     <div>
-      <ToastContainer autoClose={2000} />
       <Card className="w-[350px]">
         <CardHeader>
           <CardTitle>{title}</CardTitle>

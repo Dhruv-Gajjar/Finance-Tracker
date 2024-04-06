@@ -47,7 +47,7 @@ const Dashboard = () => {
       </div>
       <div>Chart will go here...</div>
       <div className="w-full h-full">
-        <DataTable columns={columns} data={tableData?.slice(0, 5)} />
+        <DataTable columns={columns} data={tableData?.slice(1).slice(-5)} />
       </div>
     </div>
   );
