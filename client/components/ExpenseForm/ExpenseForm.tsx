@@ -42,6 +42,7 @@ export function ExpenseForm() {
     register,
     handleSubmit,
     control,
+    reset,
     formState: { errors },
   } = useForm<IExpenseForm>();
   const { toast } = useToast();
@@ -66,6 +67,7 @@ export function ExpenseForm() {
         duration: 2000,
       });
     }
+    reset();
   };
 
   return (
