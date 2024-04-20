@@ -31,7 +31,7 @@ export class ExpensesController {
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: number) {
-    return this.expensesService.findOne(+id);
+    return this.expensesService.findExpenseByUserId(+id);
   }
 
   @UseGuards(JwtAuthGuard)

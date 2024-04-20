@@ -16,10 +16,10 @@ export class ExpensesService {
     return await this.prismaService.expenses.findMany({});
   }
 
-  async findOne(id: number) {
-    return await this.prismaService.expenses.findUnique({
+  async findExpenseByUserId(id: number) {
+    return await this.prismaService.expenses.findMany({
       where: {
-        id,
+        userId: id,
       },
     });
   }
