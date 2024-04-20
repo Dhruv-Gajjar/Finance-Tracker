@@ -18,6 +18,7 @@ interface IAuthContext {
   setToken: Dispatch<SetStateAction<string>>;
   login: (data: IUser) => Promise<void>;
   signUp: (data: IUser) => Promise<void>;
+  logout: () => void;
 }
 
 interface IUser {
@@ -82,6 +83,11 @@ export const AuthContextProvider = (props: { children: any }) => {
     }
   };
 
+  const logout = () => {
+    localStorage.removeItem("token");
+    setToken("");
+  };
+
   const getUser = async () => {
     const userString = localStorage.getItem("user");
     let user = null;
@@ -133,8 +139,9 @@ export const AuthContextProvider = (props: { children: any }) => {
       setToken,
       login,
       signUp,
+      logout,
     }),
-    [user, token, setToken, login, signUp]
+    [user, token, setToken, login, signUp, logout]
   );
 
   return (

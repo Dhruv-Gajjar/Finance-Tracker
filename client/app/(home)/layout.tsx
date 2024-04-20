@@ -7,9 +7,8 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 export default function DashboardLayout({ children }: React.PropsWithChildren) {
   return (
-    <div className="flex items-center justify-between w-full h-[100vh] mx-auto overflow-y-auto">
-      <Sidebar />
-      {children}
+    <div>
+      <Sidebar children={children} />
     </div>
   );
 }

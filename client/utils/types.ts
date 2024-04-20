@@ -14,3 +14,11 @@ export enum ExpenseTypes {
   insurance,
   food,
 }
+
+export type Expenses = {
+  id: number;
+  title: string;
+  description: string;
+  type: ExpenseTypes;
+  amount: number;
+};

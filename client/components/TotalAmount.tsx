@@ -9,20 +9,15 @@ const TotalAmount = (props: {
 }) => {
   const { title, amount, color } = props;
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>
-          <p className="flex items-center font-bold text-md w-60">
-            <span>
-              <DollarSign className="h-6 w-6" />
-            </span>{" "}
+          <p className="flex items-center text-[15px] text-gray-400 w-60">
             {title}
           </p>
         </CardTitle>
-        {/* <CardDescription>{Card Description}</CardDescription> */}
       </CardHeader>
       <CardContent>
-        {/* <p className={`text-3xl font-bold ${color}`}>$ {amount}</p> */}
         <p className={`flex items-center text-3xl font-bold ${color}`}>
           <span>
             <DollarSign className="h-8 w-8" />

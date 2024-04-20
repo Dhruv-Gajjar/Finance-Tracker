@@ -39,10 +39,7 @@ export const columns: ColumnDef<Expenses>[] = [
     header: "Amount",
     cell: ({ row }) => {
       const amount: React.ReactNode = row.getValue("amount");
-
-      return (
-        <div className="flex gap-2 items-center font-bold">$ {amount}</div>
-      );
+      return <div className="flex gap-2 items-center">$ {amount}</div>;
     },
   },
   {
@@ -50,8 +47,33 @@ export const columns: ColumnDef<Expenses>[] = [
     header: "Type",
     cell: ({ row }) => {
       const expenseType: React.ReactNode = row.getValue("type");
-
-      return <div className="flex gap-2 items-center">{expenseType}</div>;
+      return (
+        <div className="flex gap-2 items-center capitalize">
+          <p
+            className={`${
+              expenseType === "food"
+                ? "bg-teal-200 text-teal-600"
+                : expenseType === "salary"
+                ? "bg-green-200 text-green-600"
+                : expenseType === "bill"
+                ? "bg-yellow-200 text-yellow-600"
+                : expenseType === "subscribtion"
+                ? "bg-red-200 text-red-600"
+                : expenseType === "emi"
+                ? "bg-orange-200 text-orange-600"
+                : expenseType === "grocery"
+                ? "bg-cyan-200 text-cyan-600"
+                : expenseType === "insurance"
+                ? "bg-blue-200 text-blue-600"
+                : expenseType === "rent"
+                ? "bg-purple-200 text-purple-600"
+                : ""
+            } px-4 py-1 rounded-xl font-bold`}
+          >
+            {expenseType}
+          </p>
+        </div>
+      );
     },
   },
 ];
