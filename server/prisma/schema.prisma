@@ -21,23 +21,38 @@ model User {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @default(now())
   expenses  Expenses[]
+  incomes   Incomes[]
 }
 
 model Expenses {
-  id          Int          @id @default(autoincrement())
+  id          Int             @id @default(autoincrement())
   title       String
-  type        ExpenseTypes
-  description String
+  type        Types
+  category    ExpenseCategory
+  description String?
   amount      Float
   date        String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @default(now())
-  user        User         @relation(fields: [userId], references: [id])
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @default(now())
+  user        User            @relation(fields: [userId], references: [id])
   userId      Int
 }
 
-enum ExpenseTypes {
-  salary
+model Incomes {
+  id          Int            @id @default(autoincrement())
+  title       String
+  type        Types
+  category    IncomeCategory
+  description String?
+  amount      Float
+  date        String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @default(now())
+  user        User           @relation(fields: [userId], references: [id])
+  userId      Int
+}
+
+enum ExpenseCategory {
   bill
   grocery
   emi
@@ -45,4 +60,19 @@ enum ExpenseTypes {
   subscribtion
   insurance
   food
+  travel
+}
+
+enum IncomeCategory {
+  salary
+  bonus
+  investment
+  gift
+  rental_income
+  other
+}
+
+enum Types {
+  income
+  expense
 }
