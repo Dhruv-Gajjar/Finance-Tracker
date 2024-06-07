@@ -122,7 +122,7 @@ const AuthForm = (props: { title: string }) => {
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button type="submit" onClick={handleSubmit(onSubmit)}>
-            Submit
+            {title === "Login" ? "Login" : "Signup"}
           </Button>
         </CardFooter>
       </Card>

@@ -48,10 +48,10 @@ const Dashboard = () => {
         />
         <TotalAmount title="Total Spent" amount={10000} color="text-red-600" />
       </div>
-      <div className="w-[400px] md:w-full">
+      <div className="w-fit md:w-full">
         <Chart expenseData={tableData} />
       </div>
-      <div className="w-[400px] md:w-full h-full">
+      <div className="w-fit md:w-full h-full">
         <DataTable columns={columns} data={tableData?.slice(1).slice(-5)} />
       </div>
     </div>

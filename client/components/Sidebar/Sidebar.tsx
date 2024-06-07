@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import useAuth from "@/context/AuthContext";
 import {
+  Banknote,
   CreditCard,
   DollarSign,
   Home,
@@ -12,7 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useState } from "react";
 import { DarkModeToggler } from "../DarkModeToggler";
 // import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
@@ -24,8 +25,13 @@ const linkClass =
   "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary";
 
 const Sidebar: FC<{ children: ReactNode }> = ({ children }) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const pathName = usePathname();
   const { logout } = useAuth();
+
+  const openChange = () => {
+    setIsOpen((prev) => !prev);
+  };
 
   return (
     <div className="grid h-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -49,11 +55,18 @@ const Sidebar: FC<{ children: ReactNode }> = ({ children }) => {
                 Dashboard
               </Link>
               <Link
+                href="/incomes"
+                className={pathName === "/incomes" ? activeClass : linkClass}
+              >
+                <Banknote className="h-4 w-4" />
+                Incomes
+              </Link>
+              <Link
                 href="/expenses"
                 className={pathName === "/expenses" ? activeClass : linkClass}
               >
                 <DollarSign className="h-4 w-4" />
-                Expenses / Incomes
+                Expenses
               </Link>
               <Link
                 href="/transactions"
@@ -63,13 +76,6 @@ const Sidebar: FC<{ children: ReactNode }> = ({ children }) => {
               >
                 <CreditCard className="h-4 w-4" />
                 Transactions{" "}
-              </Link>
-              <Link
-                href="/profile"
-                className={pathName === "/profile" ? activeClass : linkClass}
-              >
-                <Users className="h-4 w-4" />
-                Profile
               </Link>
             </nav>
           </div>
@@ -85,13 +91,9 @@ const Sidebar: FC<{ children: ReactNode }> = ({ children }) => {
       {/* Mobile Sidebar */}
       <div className="flex flex-col">
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 sm:hidden">
-          <Sheet>
+          <Sheet open={isOpen} onOpenChange={openChange}>
             <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="shrink-0 sm:hidden"
-              >
+              <Button variant={"ghost"} size={"icon"} className="sm:hidden">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
@@ -103,32 +105,36 @@ const Sidebar: FC<{ children: ReactNode }> = ({ children }) => {
                   className={
                     pathName === "/dashboard" ? activeClass : linkClass
                   }
+                  onClick={openChange}
                 >
                   <Home className="h-4 w-4" />
                   Dashboard
                 </Link>
                 <Link
-                  href="/expenses"
-                  className={pathName === "/expenses" ? activeClass : linkClass}
+                  href="/incomes"
+                  className={pathName === "/incomes" ? activeClass : linkClass}
+                  onClick={openChange}
                 >
                   <DollarSign className="h-4 w-4" />
-                  Expenses / Incomes
+                  Incomes
+                </Link>
+                <Link
+                  href="/expenses"
+                  className={pathName === "/expenses" ? activeClass : linkClass}
+                  onClick={openChange}
+                >
+                  <DollarSign className="h-4 w-4" />
+                  Expenses
                 </Link>
                 <Link
                   href="/transactions"
                   className={
                     pathName === "/transactions" ? activeClass : linkClass
                   }
+                  onClick={openChange}
                 >
                   <CreditCard className="h-4 w-4" />
                   Transactions{" "}
-                </Link>
-                <Link
-                  href="/profile"
-                  className={pathName === "/profile" ? activeClass : linkClass}
-                >
-                  <Users className="h-4 w-4" />
-                  Profile
                 </Link>
               </nav>
               <div>

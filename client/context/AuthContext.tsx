@@ -2,6 +2,7 @@
 import { toast } from "@/components/ui/use-toast";
 import { get, post } from "@/utils/axiosService";
 import { checkTokenExpiration } from "@/utils/checkTokenExpiration";
+import { useRouter } from "next/navigation";
 import {
   Dispatch,
   SetStateAction,
@@ -36,6 +37,7 @@ export const AuthContextProvider = (props: { children: any }) => {
   const [token, setToken] = useState<string>(
     typeof window !== "undefined" ? localStorage.getItem("token") || "" : ""
   );
+  const router = useRouter();
   // const [isTokenExpired, setIsTokenExpired] = useState<boolean>(false);
   useEffect(() => {
     if (token) {
@@ -103,9 +105,10 @@ export const AuthContextProvider = (props: { children: any }) => {
       setUser(userData?.response);
     } else {
       toast({
+        variant: "destructive",
         title: "User not found",
-        className: "bg-reg-600",
       });
+      // router.push("/signup");
     }
   };
 
@@ -126,7 +129,7 @@ export const AuthContextProvider = (props: { children: any }) => {
       } else {
         toast({
           title: "Fail to refresh Token",
-          className: "bg-reg-600",
+          className: "bg-red-600",
         });
       }
     }

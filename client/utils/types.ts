@@ -4,7 +4,17 @@ export type IAuthForm = {
   email: string;
 };
 
-export enum ExpenseTypes {
+export interface ICustomCategoryForm {
+  name: string;
+  icon: string;
+}
+
+export enum Types {
+  income,
+  expense,
+}
+
+export enum ExpenseCategory {
   salary,
   bill,
   grocery,
@@ -15,10 +25,29 @@ export enum ExpenseTypes {
   food,
 }
 
+export enum IncomeCategory {
+  salary,
+  bonus,
+  investment,
+  gift,
+  rental_income,
+  other,
+}
+
+export type Income = {
+  id: number;
+  title: string;
+  description: string;
+  type: Types;
+  category: IncomeCategory;
+  amount: number;
+};
+
 export type Expenses = {
   id: number;
   title: string;
   description: string;
-  type: ExpenseTypes;
+  type: Types;
+  category: ExpenseCategory;
   amount: number;
 };

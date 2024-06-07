@@ -1,12 +1,16 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
-
-import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
@@ -17,7 +21,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -25,18 +28,26 @@ import { useToast } from "@/components/ui/use-toast";
 import useAuth from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { post } from "@/utils/axiosService";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import CustomCategoryForm from "./CustomCategoryForm";
+import ExpenseCategory from "./ExpenseCategory";
+import IncomeCategory from "./IncomeCategory";
 
-interface IExpenseForm {
+interface IIncomeExpenseForm {
   title: string;
   description?: string;
   amount: number;
   date: string;
   type: string;
+  category: string;
   userId: number;
 }
 
-export function ExpenseForm() {
+export function IncomeExpenseForm() {
   const { user, token } = useAuth();
   const {
     register,
@@ -44,16 +55,21 @@ export function ExpenseForm() {
     control,
     reset,
     formState: { errors },
-  } = useForm<IExpenseForm>();
+    watch,
+  } = useForm<IIncomeExpenseForm>({
+    defaultValues: {
+      type: "income",
+    },
+  });
   const { toast } = useToast();
-
   const [date, setDate] = useState<Date>();
+  const incomeExpenseType = watch("type");
 
   const config = {
     headers: { Authorization: `Bearer ${token}` },
   };
 
-  const onSubmit = async (data: IExpenseForm) => {
+  const onSubmit = async (data: IIncomeExpenseForm) => {
     if (typeof data?.amount === "string") {
       data.amount = parseInt(data?.amount);
     }
@@ -92,8 +108,8 @@ export function ExpenseForm() {
             {...register("description")}
           />
           {/* {errors.description?.type === "" && (
-            <p className="text-red-400">Description is required</p>
-          )} */}
+              <p className="text-red-400">Description is required</p>
+            )} */}
         </div>
         <div className="flex flex-col space-y-1.5">
           <Label htmlFor="amount">Amount</Label>
@@ -108,34 +124,90 @@ export function ExpenseForm() {
           )}
         </div>
         <div className="flex flex-col space-y-1.5">
-          <Label htmlFor="type">Expense Type</Label>
+          <Label htmlFor="types">Types</Label>
           <Controller
             name="type"
             control={control} // Provide control from useForm
             rules={{ required: "Field is required" }}
             render={({ field: { onChange, value } }) => (
               <>
-                <Select onValueChange={onChange} value={value}>
+                <Select
+                  onValueChange={onChange}
+                  value={value}
+                  defaultValue="income"
+                >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a expense type" />
+                    <SelectValue placeholder="Select a type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Expense Types</SelectLabel>
-                      <SelectItem value="salary">salary</SelectItem>
-                      <SelectItem value="bill">bill</SelectItem>
-                      <SelectItem value="grocery">grocery</SelectItem>
-                      <SelectItem value="emi">emi</SelectItem>
-                      <SelectItem value="rent">rent</SelectItem>
-                      <SelectItem value="subscribtion">subscribtion</SelectItem>
-                      <SelectItem value="insurance">insurance</SelectItem>
-                      <SelectItem value="food">food</SelectItem>
+                    <SelectGroup className="capitalize">
+                      <SelectItem defaultValue="income" value="income">
+                        income
+                      </SelectItem>
+                      <SelectItem value="expense">expense</SelectItem>
                     </SelectGroup>
                   </SelectContent>
-                  {errors.type && (
-                    <p className="text-red-400">Expense Type is required</p>
+                  {errors.type?.type === "required" && (
+                    <p className="text-red-400">Type is required</p>
                   )}
                 </Select>
+              </>
+            )}
+          />
+        </div>
+        <div className="flex flex-col space-y-1.5">
+          {/*
+              TODO: both type and category required message goes away when i select either one of them
+            */}
+          <Label htmlFor="category">Category</Label>
+          <Controller
+            name="category"
+            control={control} // Provide control from useForm
+            rules={{ required: "Field is required" }}
+            render={({ field: { onChange, value } }) => (
+              <>
+                <Dialog>
+                  <DialogTrigger className="self-start" asChild>
+                    <Button variant="ghost">Create a category</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      Create{" "}
+                      {incomeExpenseType === "income" ? "Income" : "Expense"}{" "}
+                      category
+                    </DialogHeader>
+                    <DialogDescription className="text-center">
+                      Create you own custom category...
+                    </DialogDescription>
+                    <CustomCategoryForm />
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button
+                          type="button"
+                          variant={"secondary"}
+                          onClick={() => {
+                            reset();
+                          }}
+                        >
+                          Cancle
+                        </Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+                {incomeExpenseType === "income" ? (
+                  <IncomeCategory
+                    errors={errors}
+                    onChange={onChange}
+                    value={value}
+                  />
+                ) : (
+                  <ExpenseCategory
+                    errors={errors}
+                    onChange={onChange}
+                    value={value}
+                  />
+                )}
               </>
             )}
           />

@@ -27,7 +27,7 @@ model User {
 model Expenses {
   id          Int             @id @default(autoincrement())
   title       String
-  type        Types
+  type        Types           @default(income)
   category    ExpenseCategory
   description String?
   amount      Float
