@@ -14,14 +14,15 @@ datasource db {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  username  String     @unique
-  password  String
-  email     String     @unique
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @default(now())
-  expenses  Expenses[]
-  incomes   Incomes[]
+  id             Int              @id @default(autoincrement())
+  username       String           @unique
+  password       String
+  email          String           @unique
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now())
+  expenses       Expenses[]
+  incomes        Incomes[]
+  customCategory CustomCategory[]
 }
 
 model Expenses {
@@ -50,6 +51,15 @@ model Incomes {
   updatedAt   DateTime       @default(now())
   user        User           @relation(fields: [userId], references: [id])
   userId      Int
+}
+
+model CustomCategory {
+  id           Int    @id @default(autoincrement())
+  name         String
+  icon         String
+  categoryType Types  @default(income)
+  user         User   @relation(fields: [userId], references: [id])
+  userId       Int
 }
 
 enum ExpenseCategory {
