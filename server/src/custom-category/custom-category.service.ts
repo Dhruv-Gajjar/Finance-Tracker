@@ -12,8 +12,14 @@ export class CustomCategoryService {
     });
   }
 
-  findAll() {
-    return this.prismaService.customCategory.findMany({});
+  async findAll(userId: number) {
+    if (userId) {
+      return await this.prismaService.customCategory.findMany({
+        where: {
+          userId: userId,
+        },
+      });
+    }
   }
 
   findOne(id: number) {

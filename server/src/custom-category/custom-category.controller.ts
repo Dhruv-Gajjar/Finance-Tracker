@@ -19,9 +19,9 @@ export class CustomCategoryController {
     return this.customCategoryService.create(createCustomCategoryDto);
   }
 
-  @Get()
-  findAll() {
-    return this.customCategoryService.findAll();
+  @Get(':userId')
+  async findAll(@Param('userId') userId: string) {
+    return await this.customCategoryService.findAll(+userId);
   }
 
   @Get(':id')
