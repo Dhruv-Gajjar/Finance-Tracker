@@ -1,4 +1,5 @@
-import React from "react";
+import { CustomCategory } from "@/utils/types";
+import React, { FC } from "react";
 import { FieldErrors } from "react-hook-form";
 import {
   Select,
@@ -10,29 +11,42 @@ import {
   SelectValue,
 } from "../ui/select";
 
-interface IIncomeCategory {
+interface IncomeCategoryProps {
   value: string;
   onChange: (value: string) => void;
   errors: FieldErrors<any>;
+  incomes: CustomCategory[];
 }
 
-const IncomeCategory = (props: IIncomeCategory) => {
-  const { onChange, value, errors } = props;
+const IncomeCategory: FC<IncomeCategoryProps> = ({
+  errors,
+  incomes,
+  onChange,
+  value,
+}) => {
   return (
     <div>
       <Select onValueChange={onChange} value={value}>
         <SelectTrigger>
-          <SelectValue placeholder="Select a expense type" />
+          <SelectValue placeholder="Select a Income type" />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup className="capitalize">
             <SelectLabel>Income Types</SelectLabel>
-            <SelectItem value="salary">salary</SelectItem>
-            <SelectItem value="bonus">bonus</SelectItem>
-            <SelectItem value="investment">investment</SelectItem>
-            <SelectItem value="gift">gift</SelectItem>
-            <SelectItem value="rental_income">rental income</SelectItem>
-            <SelectItem value="other">other</SelectItem>
+            {incomes?.length > 0 ? (
+              incomes?.map(
+                (income: CustomCategory) =>
+                  income.categoryType === "income" && (
+                    <SelectItem key={income?.id} value={income.id?.toString()!}>
+                      {income.name} {income.icon}
+                    </SelectItem>
+                  )
+              )
+            ) : (
+              <p className="p-6 text-sm mx-auto text-primary">
+                Please add a Income Category
+              </p>
+            )}
           </SelectGroup>
         </SelectContent>
         {errors.type?.type === "required" && (

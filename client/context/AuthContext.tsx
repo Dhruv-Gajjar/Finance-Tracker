@@ -5,8 +5,10 @@ import { checkTokenExpiration } from "@/utils/checkTokenExpiration";
 import { useRouter } from "next/navigation";
 import {
   Dispatch,
+  ReactNode,
   SetStateAction,
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -31,14 +33,15 @@ interface IUser {
 
 export const AuthContext = createContext<IAuthContext | null>(null);
 
-export const AuthContextProvider = (props: { children: any }) => {
+export const AuthContextProvider = (props: { children: ReactNode }) => {
   const { children } = props;
   const [user, setUser] = useState<IUser | null>(null);
   const [token, setToken] = useState<string>(
     typeof window !== "undefined" ? localStorage.getItem("token") || "" : ""
   );
   const router = useRouter();
-  // const [isTokenExpired, setIsTokenExpired] = useState<boolean>(false);
+
+  const [isTokenExpired, setIsTokenExpired] = useState<boolean>(false);
   useEffect(() => {
     if (token) {
       getUser();
@@ -52,7 +55,7 @@ export const AuthContextProvider = (props: { children: any }) => {
     }
   }, [token]);
 
-  const login = async (data: IUser): Promise<void> => {
+  const login = useCallback(async (data: IUser): Promise<void> => {
     const loginData = await post("/auth/login", data);
     if (loginData?.status !== 200) {
       toast({
@@ -71,9 +74,30 @@ export const AuthContextProvider = (props: { children: any }) => {
       localStorage.setItem("refreshToken", loginData?.response?.refreshToken);
       localStorage.setItem("user", JSON.stringify(userObj));
     }
-  };
+  }, []);
 
-  const signUp = async (data: IUser) => {
+  // const login = async (data: IUser): Promise<void> => {
+  //   const loginData = await post("/auth/login", data);
+  //   if (loginData?.status !== 200) {
+  //     toast({
+  //       variant: "destructive",
+  //       title: loginData?.response?.data?.message,
+  //     });
+  //   } else {
+  //     const userObj = {
+  //       userId: loginData?.response?.id,
+  //       username: loginData?.response?.username,
+  //       email: loginData?.response?.email,
+  //     };
+  //     setUser(loginData?.response);
+  //     setToken(loginData?.response?.token);
+  //     localStorage.setItem("token", loginData?.response?.token);
+  //     localStorage.setItem("refreshToken", loginData?.response?.refreshToken);
+  //     localStorage.setItem("user", JSON.stringify(userObj));
+  //   }
+  // };
+
+  const signUp = useCallback(async (data: IUser) => {
     const signUpData = await post("auth/register", data);
     if (signUpData?.status !== 200) {
       return toast({
@@ -83,12 +107,12 @@ export const AuthContextProvider = (props: { children: any }) => {
     } else {
       return signUpData;
     }
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem("token");
     setToken("");
-  };
+  }, []);
 
   const getUser = async () => {
     const userString = localStorage.getItem("user");

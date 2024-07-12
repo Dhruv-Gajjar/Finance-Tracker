@@ -9,26 +9,75 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
-import { ICustomCategoryForm } from "@/utils/types";
+import useAuth from "@/context/AuthContext";
+import { createCustomCategory } from "@/services/customCategory.service";
+import { ICustomCategoryForm, Types } from "@/utils/types";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import { PopoverContent } from "@radix-ui/react-popover";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CircleOff } from "lucide-react";
-import React from "react";
-import { useForm } from "react-hook-form";
+import React, { FC } from "react";
+import { SubmitHandler, useForm, UseFormReset } from "react-hook-form";
+import { DialogClose, DialogFooter } from "../ui/dialog";
+import { useToast } from "../ui/use-toast";
 
-function CustomCategoryForm() {
+interface CustomCategoryFormProps {
+  type: string;
+}
+
+const CustomCategoryForm: FC<CustomCategoryFormProps> = ({ type }) => {
+  const { user } = useAuth();
   const form = useForm<ICustomCategoryForm>();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
-  const onSubmit = async (data: ICustomCategoryForm) => {
-    console.log("CustomCategory: ", data);
-    // reset();
+  console.log("USERRR", user);
+  const { status, error, mutate } = useMutation({
+    mutationFn: createCustomCategory,
+    onSuccess: (newCategory) => {
+      queryClient.setQueryData(["custom-category"], newCategory);
+      console.log("NEW_CAT: ", newCategory);
+      form.reset();
+      toast({
+        value: "default",
+        title: "Category created succesfully!",
+        className: "bg-green-600",
+      });
+    },
+    onError: (error) => {
+      toast({
+        value: "warning",
+        title: "Failed to create category!",
+        className: "bg-red-600",
+      });
+    },
+  });
+
+  const onSubmit: SubmitHandler<ICustomCategoryForm> = async (
+    data: ICustomCategoryForm
+  ) => {
+    mutate({
+      name: data?.name,
+      icon: data?.icon,
+      categoryType: type,
+      userId: user?.id!,
+    });
   };
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.stopPropagation();
+    form.handleSubmit(onSubmit)(event);
+  };
+
+  if (status === "error") {
+    return <div className="text-2xl mx-auto text-red-600">{error.message}</div>;
+  }
 
   return (
     <div className="grid gap-4 py-4">
       <Form {...form}>
-        <form className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-8">
           <FormField
             control={form.control}
             name="name"
@@ -76,9 +125,10 @@ function CustomCategoryForm() {
                     <PopoverContent className="w-full">
                       <Picker
                         data={data}
-                        onEmojiSelect={(emoji: { native: string }) =>
-                          field.onChange(emoji.native)
-                        }
+                        onEmojiSelect={(emoji: { native: string }) => {
+                          console.log("Emoji: ", emoji);
+                          field.onChange(emoji.native);
+                        }}
                         theme={"auto"}
                       />
                     </PopoverContent>
@@ -90,10 +140,29 @@ function CustomCategoryForm() {
               </FormItem>
             )}
           />
+          <DialogFooter>
+            <Button
+              type="submit"
+              disabled={status === "pending" ? true : false}
+            >
+              {status === "pending" ? "Loading..." : "Add"}
+            </Button>
+            <DialogClose asChild>
+              <Button
+                type="button"
+                variant={"secondary"}
+                onClick={() => {
+                  form.reset();
+                }}
+              >
+                Cancle
+              </Button>
+            </DialogClose>
+          </DialogFooter>
         </form>
       </Form>
     </div>
   );
-}
+};
 
 export default CustomCategoryForm;

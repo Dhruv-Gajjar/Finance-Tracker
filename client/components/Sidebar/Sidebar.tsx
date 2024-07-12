@@ -34,10 +34,10 @@ const Sidebar: FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   return (
-    <div className="grid h-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+    <div className="sticky grid h-[100vh] w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       {/* Medium screen sidebar */}
       <div className="hidden border-r bg-muted/40 md:block">
-        <div className="flex h-full max-h-screen flex-col gap-2 bg-white shadow-md dark:bg-zinc-950">
+        <div className="flex h-full min-h-screen flex-col gap-2 bg-white shadow-md dark:bg-zinc-950">
           <div className="flex justify-between h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <Package2 className="h-6 w-6" />
@@ -55,15 +55,15 @@ const Sidebar: FC<{ children: ReactNode }> = ({ children }) => {
                 Dashboard
               </Link>
               <Link
-                href="/incomes"
-                className={pathName === "/incomes" ? activeClass : linkClass}
+                href="/income"
+                className={pathName === "/income" ? activeClass : linkClass}
               >
                 <Banknote className="h-4 w-4" />
                 Incomes
               </Link>
               <Link
-                href="/expenses"
-                className={pathName === "/expenses" ? activeClass : linkClass}
+                href="/expense"
+                className={pathName === "/expense" ? activeClass : linkClass}
               >
                 <DollarSign className="h-4 w-4" />
                 Expenses

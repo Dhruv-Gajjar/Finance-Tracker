@@ -27,27 +27,27 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import useAuth from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
+import { getAllCustomCategory } from "@/services/customCategory.service";
 import { post } from "@/utils/axiosService";
+import { CustomCategory, IIncomeExpenseForm } from "@/utils/types";
 import { DialogClose } from "@radix-ui/react-dialog";
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { FC, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import Description from "../Description/Description";
+import Title from "../Title/Title";
 import CustomCategoryForm from "./CustomCategoryForm";
 import ExpenseCategory from "./ExpenseCategory";
 import IncomeCategory from "./IncomeCategory";
 
-interface IIncomeExpenseForm {
-  title: string;
-  description?: string;
-  amount: number;
-  date: string;
-  type: string;
-  category: string;
-  userId: number;
+interface IncomeExpenseFormProps {
+  pathname: string;
 }
 
-export function IncomeExpenseForm() {
+const IncomeExpenseForm: FC<IncomeExpenseFormProps> = ({ pathname }) => {
   const { user, token } = useAuth();
   const {
     register,
@@ -56,14 +56,17 @@ export function IncomeExpenseForm() {
     reset,
     formState: { errors },
     watch,
-  } = useForm<IIncomeExpenseForm>({
-    defaultValues: {
-      type: "income",
-    },
-  });
+    getValues,
+  } = useForm<IIncomeExpenseForm>();
   const { toast } = useToast();
   const [date, setDate] = useState<Date>();
-  const incomeExpenseType = watch("type");
+  const [incomeData, setIncomeData] = useState<CustomCategory>();
+  const [expenseData, setExpenseData] = useState<CustomCategory>();
+
+  const { status, error, data } = useQuery({
+    queryKey: ["custom-category", user?.id],
+    queryFn: () => getAllCustomCategory(user?.id!),
+  });
 
   const config = {
     headers: { Authorization: `Bearer ${token}` },
@@ -76,41 +79,33 @@ export function IncomeExpenseForm() {
     if (date && user && user.id) {
       const formattedDate = format(date, "dd-MM-yyyy");
       data = { ...data, date: formattedDate, userId: user?.id };
-      await post("/expenses", data, config);
-      toast({
-        title: "Expense added succesfully",
-        className: "bg-green-600",
-        duration: 2000,
-      });
+      console.log("Data: ", data);
+      // await post("/expenses", data, config);
+      // toast({
+      //   title: "Expense added succesfully",
+      //   className: "bg-green-600",
+      //   duration: 2000,
+      // });
     }
     reset();
   };
 
+  console.log("DATAAA: ", data);
+
+  // if (data) {
+  //   data?.filter((item: CustomCategory) => {
+  //     if (item.categoryType === "income") setIncomeData(item);
+  //     if (item.categoryType === "expense") setExpenseData(item);
+  //   });
+  //   console.log("INC_DATA: ", incomeData);
+  //   console.log("EXP_DATA: ", expenseData);
+  // }
+
   return (
-    <div className="grid gap-4 py-4">
+    <div className="w-100 grid gap-4 py-4">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        <div className="flex flex-col space-y-1.5">
-          <Label htmlFor="title">Title</Label>
-          <Input
-            id="title"
-            placeholder="Title"
-            {...register("title", { required: true })}
-          />
-          {errors.title?.type === "required" && (
-            <p className="text-red-400">Title is required</p>
-          )}
-        </div>
-        <div className="flex flex-col space-y-1.5">
-          <Label htmlFor="description">Description</Label>
-          <Input
-            id="description"
-            placeholder="Description"
-            {...register("description")}
-          />
-          {/* {errors.description?.type === "" && (
-              <p className="text-red-400">Description is required</p>
-            )} */}
-        </div>
+        <Title name="Title" register={register} errors={errors} />
+        <Description register={register} />
         <div className="flex flex-col space-y-1.5">
           <Label htmlFor="amount">Amount</Label>
           <Input
@@ -123,7 +118,7 @@ export function IncomeExpenseForm() {
             <p className="text-red-400">Amount is required</p>
           )}
         </div>
-        <div className="flex flex-col space-y-1.5">
+        {/* <div className="flex flex-col space-y-1.5">
           <Label htmlFor="types">Types</Label>
           <Controller
             name="type"
@@ -154,7 +149,7 @@ export function IncomeExpenseForm() {
               </>
             )}
           />
-        </div>
+        </div> */}
         <div className="flex flex-col space-y-1.5">
           {/*
               TODO: both type and category required message goes away when i select either one of them
@@ -172,40 +167,36 @@ export function IncomeExpenseForm() {
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      Create{" "}
-                      {incomeExpenseType === "income" ? "Income" : "Expense"}{" "}
+                      Create {pathname === "income" ? "Income" : "Expense"}{" "}
                       category
                     </DialogHeader>
                     <DialogDescription className="text-center">
                       Create you own custom category...
                     </DialogDescription>
-                    <CustomCategoryForm />
-                    <DialogFooter>
-                      <DialogClose asChild>
-                        <Button
-                          type="button"
-                          variant={"secondary"}
-                          onClick={() => {
-                            reset();
-                          }}
-                        >
-                          Cancle
-                        </Button>
-                      </DialogClose>
-                    </DialogFooter>
+                    <DialogContent>
+                      <CustomCategoryForm type={pathname} />
+                    </DialogContent>
                   </DialogContent>
                 </Dialog>
-                {incomeExpenseType === "income" ? (
-                  <IncomeCategory
-                    errors={errors}
-                    onChange={onChange}
-                    value={value}
-                  />
+                {pathname === "income" ? (
+                  status === "pending" ? (
+                    <div className="text-xl text-foreground">Loading...</div>
+                  ) : (
+                    <IncomeCategory
+                      errors={errors}
+                      onChange={onChange}
+                      value={value}
+                      incomes={data!}
+                    />
+                  )
+                ) : status == "pending" ? (
+                  <div className="text-xl text-foreground">Loading...</div>
                 ) : (
                   <ExpenseCategory
                     errors={errors}
                     onChange={onChange}
                     value={value}
+                    expenses={data!}
                   />
                 )}
               </>
@@ -241,4 +232,6 @@ export function IncomeExpenseForm() {
       </form>
     </div>
   );
-}
+};
+
+export default IncomeExpenseForm;

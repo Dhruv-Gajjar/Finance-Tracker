@@ -1,4 +1,5 @@
-import React from "react";
+import { CustomCategory } from "@/utils/types";
+import React, { FC } from "react";
 import { FieldErrors } from "react-hook-form";
 import {
   Select,
@@ -10,14 +11,19 @@ import {
   SelectValue,
 } from "../ui/select";
 
-interface IExpenseCategory {
+interface ExpenseCategoryProps {
   value: string;
   onChange: (value: string) => void;
   errors: FieldErrors<any>;
+  expenses: CustomCategory[];
 }
 
-const ExpenseCategory = (props: IExpenseCategory) => {
-  const { onChange, value, errors } = props;
+const ExpenseCategory: FC<ExpenseCategoryProps> = ({
+  errors,
+  expenses,
+  onChange,
+  value,
+}) => {
   return (
     <div>
       <Select onValueChange={onChange} value={value}>
@@ -27,14 +33,23 @@ const ExpenseCategory = (props: IExpenseCategory) => {
         <SelectContent>
           <SelectGroup className="capitalize">
             <SelectLabel>Expense Types</SelectLabel>
-            <SelectItem value="bill">bill</SelectItem>
-            <SelectItem value="grocery">grocery</SelectItem>
-            <SelectItem value="emi">emi</SelectItem>
-            <SelectItem value="rent">rent</SelectItem>
-            <SelectItem value="subscribtion">subscribtion</SelectItem>
-            <SelectItem value="insurance">insurance</SelectItem>
-            <SelectItem value="food">food</SelectItem>
-            <SelectItem value="travel">travel</SelectItem>
+            {expenses?.length > 0 ? (
+              expenses?.map(
+                (expense: CustomCategory) =>
+                  expense.categoryType === "expense" && (
+                    <SelectItem
+                      key={expense?.id}
+                      value={expense.id?.toString()!}
+                    >
+                      {expense.name} {expense.icon}
+                    </SelectItem>
+                  )
+              )
+            ) : (
+              <p className="p-6 text-sm mx-auto text-primary">
+                Please add a Expense Category
+              </p>
+            )}
           </SelectGroup>
         </SelectContent>
         {errors.type?.type === "required" && (

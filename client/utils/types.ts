@@ -9,6 +9,16 @@ export interface ICustomCategoryForm {
   icon: string;
 }
 
+export interface IIncomeExpenseForm {
+  title: string;
+  description?: string;
+  amount: number;
+  date: string;
+  type: string;
+  category: string;
+  userId: number;
+}
+
 export enum Types {
   income,
   expense,
@@ -51,3 +61,11 @@ export type Expenses = {
   category: ExpenseCategory;
   amount: number;
 };
+
+export interface CustomCategory {
+  id?: number;
+  name: string;
+  icon: string;
+  categoryType: string;
+  userId: number;
+}
