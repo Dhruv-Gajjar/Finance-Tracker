@@ -16,10 +16,15 @@ export class UsersService {
       },
       include: {
         expenses: true,
+        incomes: true,
+        customCategory: true,
+        // expenses: true,
       },
     });
 
-    const { id, email, expenses, username } = user;
+    console.log('USER_SERVICE: ', user);
+
+    const { id, email, expenses, incomes, customCategory, username } = user;
 
     return {
       status: 200,
@@ -29,6 +34,8 @@ export class UsersService {
         email,
         username,
         expenses,
+        incomes,
+        customCategory,
       },
     };
   }

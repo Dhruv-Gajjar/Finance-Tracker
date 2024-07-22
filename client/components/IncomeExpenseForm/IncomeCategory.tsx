@@ -37,7 +37,10 @@ const IncomeCategory: FC<IncomeCategoryProps> = ({
               incomes?.map(
                 (income: CustomCategory) =>
                   income.categoryType === "income" && (
-                    <SelectItem key={income?.id} value={income.id?.toString()!}>
+                    <SelectItem
+                      key={income?.id}
+                      value={income?.id?.toString()!}
+                    >
                       {income.name} {income.icon}
                     </SelectItem>
                   )

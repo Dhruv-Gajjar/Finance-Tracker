@@ -1,9 +1,9 @@
-import { ExpenseTypes } from "@/utils/types";
+import { Expenses } from "@/utils/types";
 
 type Expenses = {
   id: number;
   title: string;
   description: string;
-  type: ExpenseTypes;
+  type: Expenses;
   amount: number;
 };

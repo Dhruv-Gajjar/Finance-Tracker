@@ -28,10 +28,12 @@ import { useToast } from "@/components/ui/use-toast";
 import useAuth from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { getAllCustomCategory } from "@/services/customCategory.service";
+import { addExpenses } from "@/services/expense.service";
+import { addIncome } from "@/services/income.service";
 import { post } from "@/utils/axiosService";
-import { CustomCategory, IIncomeExpenseForm } from "@/utils/types";
+import { CustomCategory, IIncomeExpenseForm, Types } from "@/utils/types";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -60,46 +62,71 @@ const IncomeExpenseForm: FC<IncomeExpenseFormProps> = ({ pathname }) => {
   } = useForm<IIncomeExpenseForm>();
   const { toast } = useToast();
   const [date, setDate] = useState<Date>();
-  const [incomeData, setIncomeData] = useState<CustomCategory>();
-  const [expenseData, setExpenseData] = useState<CustomCategory>();
+  const queryClient = useQueryClient();
 
-  const { status, error, data } = useQuery({
+  const {
+    status,
+    error,
+    data: customCategoryData,
+  } = useQuery({
     queryKey: ["custom-category", user?.id],
     queryFn: () => getAllCustomCategory(user?.id!),
   });
 
-  const config = {
-    headers: { Authorization: `Bearer ${token}` },
-  };
+  const { data: incomeData, mutate: incomeMutation } = useMutation({
+    mutationFn: addIncome,
+    onSuccess: (newIncome) => {
+      queryClient.setQueryData(["incomes"], newIncome);
+      console.log("NEW_INCOME: ", newIncome);
+      reset();
+      toast({
+        value: "default",
+        title: "Income created succesfully!",
+        className: "bg-green-600",
+      });
+    },
+  });
 
-  const onSubmit = async (data: IIncomeExpenseForm) => {
-    if (typeof data?.amount === "string") {
-      data.amount = parseInt(data?.amount);
+  const { data: expenseData, mutate: expenseMutation } = useMutation({
+    mutationFn: addExpenses,
+    onSuccess: (newExpense) => {
+      queryClient.setQueryData(["expenses"], newExpense);
+      console.log("NEW_EXPENSE: ", newExpense);
+      reset();
+      toast({
+        value: "default",
+        title: "Expense created succesfully!",
+        className: "bg-green-600",
+      });
+    },
+  });
+
+  const onSubmit = async (formData: IIncomeExpenseForm) => {
+    if (typeof formData?.amount === "string") {
+      formData.amount = parseInt(formData?.amount);
     }
     if (date && user && user.id) {
       const formattedDate = format(date, "dd-MM-yyyy");
-      data = { ...data, date: formattedDate, userId: user?.id };
-      console.log("Data: ", data);
-      // await post("/expenses", data, config);
-      // toast({
-      //   title: "Expense added succesfully",
-      //   className: "bg-green-600",
-      //   duration: 2000,
-      // });
+      const categoryId = parseInt(formData?.category!); // Ensure this is the ID of the CustomCategory
+      formData = {
+        ...formData,
+        date: formattedDate,
+        userId: user?.id,
+        token: token,
+        type: pathname === "income" ? "income" : "expense",
+        categoryId: categoryId,
+      };
+      delete formData?.category;
+      if (pathname === "income") {
+        incomeMutation(formData);
+      }
+
+      if (pathname === "expense") {
+        expenseMutation(formData);
+      }
     }
     reset();
   };
-
-  console.log("DATAAA: ", data);
-
-  // if (data) {
-  //   data?.filter((item: CustomCategory) => {
-  //     if (item.categoryType === "income") setIncomeData(item);
-  //     if (item.categoryType === "expense") setExpenseData(item);
-  //   });
-  //   console.log("INC_DATA: ", incomeData);
-  //   console.log("EXP_DATA: ", expenseData);
-  // }
 
   return (
     <div className="w-100 grid gap-4 py-4">
@@ -185,8 +212,8 @@ const IncomeExpenseForm: FC<IncomeExpenseFormProps> = ({ pathname }) => {
                     <IncomeCategory
                       errors={errors}
                       onChange={onChange}
-                      value={value}
-                      incomes={data!}
+                      value={value!}
+                      incomes={customCategoryData!}
                     />
                   )
                 ) : status == "pending" ? (
@@ -195,8 +222,8 @@ const IncomeExpenseForm: FC<IncomeExpenseFormProps> = ({ pathname }) => {
                   <ExpenseCategory
                     errors={errors}
                     onChange={onChange}
-                    value={value}
-                    expenses={data!}
+                    value={value!}
+                    expenses={customCategoryData!}
                   />
                 )}
               </>
@@ -228,7 +255,9 @@ const IncomeExpenseForm: FC<IncomeExpenseFormProps> = ({ pathname }) => {
             </PopoverContent>
           </Popover>
         </div>
-        <Button type="submit">Add Expense</Button>
+        <Button type="submit">
+          Add {pathname === "income" ? "Income" : "Expense"}
+        </Button>
       </form>
     </div>
   );

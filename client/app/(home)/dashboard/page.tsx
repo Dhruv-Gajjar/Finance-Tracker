@@ -31,16 +31,18 @@ const Dashboard = () => {
     headers: { Authorization: `Bearer ${token}` },
   };
 
-  const { isPending, error, data } = useQuery({
-    queryKey: ["expenses"],
-    queryFn: async () => {
-      const response = await axios.get(
-        `http://localhost:5000/expenses/${1}`,
-        config
-      );
-      console.log("EXPPPPP: ", response.data);
-    },
-  });
+  console.log("User: ", user);
+
+  // const { isPending, error, data } = useQuery({
+  //   queryKey: ["expenses"],
+  //   queryFn: async () => {
+  //     const response = await axios.get(
+  //       `http://localhost:5000/expenses/${1}`,
+  //       config
+  //     );
+  //     console.log("EXPPPPP: ", response.data);
+  //   },
+  // });
 
   // useEffect(() => {
   //   if (token === "" || token === null) {

@@ -15,8 +15,10 @@ export interface IIncomeExpenseForm {
   amount: number;
   date: string;
   type: string;
-  category: string;
+  category?: string;
+  categoryId: number;
   userId: number;
+  token?: string;
 }
 
 export enum Types {
