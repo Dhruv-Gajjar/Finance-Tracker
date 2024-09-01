@@ -1,27 +1,16 @@
 import axios from "axios";
 
-const token =
-  typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
-
-export const getUser = async () => {
-  const userString = localStorage.getItem("user");
-  let user = null;
-  console.log("USERSTRING", userString);
-
-  if (userString !== null) {
-    user = JSON.parse(userString);
-  }
-
-  if (token) {
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
-    };
-    const userData = await axios.get(`users/${user?.userId}`, config);
-    if (userData?.status === 200) {
-      return userData?.data;
-    } else {
-      return "NO USER FOUND";
-      // router.push("/signup");
-    }
+export const getUserById = async (userId: number, token: string) => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+  if (userId !== undefined) {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/users/${userId}`,
+      config
+    );
+    return response.data;
+  } else {
+    return;
   }
 };

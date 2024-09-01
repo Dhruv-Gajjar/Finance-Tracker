@@ -48,4 +48,10 @@ export class ExpensesController {
   remove(@Param('id') id: number) {
     return this.expensesService.remove(+id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/latest-expenses')
+  getLatestExpenses(@Param('id') id: string) {
+    return this.expensesService.getLatestExpenses(+id);
+  }
 }

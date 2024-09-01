@@ -3,6 +3,7 @@ import Sidebar from "@/components/Sidebar/Sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthContext, AuthContextProvider } from "@/context/AuthContext";
+import { TransactionContextProvider } from "@/context/TransactionsContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { Metadata } from "next";
@@ -28,20 +29,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={poppins.className}>
         <QueryClientProvider client={queryClient}>
           <AuthContextProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-              <Toaster />
-            </ThemeProvider>
-            <ReactQueryDevtools initialIsOpen={false} />
+            <TransactionContextProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                {children}
+                <Toaster />
+              </ThemeProvider>
+              <ReactQueryDevtools initialIsOpen={false} />
+            </TransactionContextProvider>
           </AuthContextProvider>
         </QueryClientProvider>
       </body>

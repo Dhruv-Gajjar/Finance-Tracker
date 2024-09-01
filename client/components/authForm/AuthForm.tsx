@@ -103,7 +103,7 @@ const AuthForm = (props: { title: string }) => {
               <div>
                 {title === "Login" ? (
                   <Label htmlFor="signup">
-                    Don't have an account?.{" "}
+                    Don`&apos;`t have an account?.{" "}
                     <span className="text-blue-600">
                       <Link href="/signup">Signup</Link>
                     </span>

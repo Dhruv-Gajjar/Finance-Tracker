@@ -1,4 +1,4 @@
-import { ExpenseTypes, Expenses } from "@/utils/types";
+import { ExpenseTypes, Expenses, IIncomeExpenseForm } from "@/utils/types";
 import {
   BarElement,
   CategoryScale,
@@ -25,13 +25,13 @@ export const options = {
   responsive: true,
 };
 
-function Chart(props: { expenseData: Expenses[] }) {
+function Chart(props: { expenseData: IIncomeExpenseForm[] }) {
   const { expenseData } = props;
 
   const uniqueTypes: { [key in ExpenseTypes]?: boolean } = {};
   const filteredExpenses: Expenses[] = [];
 
-  expenseData?.forEach((expense: Expenses) => {
+  expenseData?.forEach((expense: IIncomeExpenseForm) => {
     if (!uniqueTypes[expense.type]) {
       filteredExpenses.push(expense);
       uniqueTypes[expense.type] = true;

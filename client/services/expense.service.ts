@@ -14,9 +14,25 @@ export const addExpenses = async (data: IIncomeExpenseForm) => {
   return response.data;
 };
 
-// export const getAllCustomCategory = async (userId: number) => {
-//   const response = await axios.get(
-//     `${process.env.NEXT_PUBLIC_BASE_URL}/custom-category/${userId}`
-//   );
-//   return response.data;
-// };
+export const getAllExpenses = async (token: string, userId: number) => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+  const response = await axios.get(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/expenses/${userId}`,
+    config
+  );
+  return response.data;
+};
+
+export const getLatestExpenses = async (token: string, userId: number) => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  const response = await axios.get(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/expenses/${userId}/latest-expenses`,
+    config
+  );
+  return response.data;
+};

@@ -16,10 +16,10 @@ export class ExpensesService {
     return await this.prismaService.expenses.findMany({});
   }
 
-  async findExpenseByUserId(id: number) {
+  async findExpenseByUserId(userId: number) {
     return await this.prismaService.expenses.findMany({
       where: {
-        userId: id,
+        userId,
       },
     });
   }
@@ -39,5 +39,19 @@ export class ExpensesService {
         id,
       },
     });
+  }
+
+  async getLatestExpenses(userId: number) {
+    const expenseData = await this.prismaService.expenses.findMany({
+      where: {
+        userId,
+      },
+      take: 5,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return expenseData;
   }
 }

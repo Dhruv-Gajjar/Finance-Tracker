@@ -22,8 +22,6 @@ export class UsersService {
       },
     });
 
-    console.log('USER_SERVICE: ', user);
-
     const { id, email, expenses, incomes, customCategory, username } = user;
 
     return {

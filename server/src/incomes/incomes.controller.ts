@@ -46,4 +46,10 @@ export class IncomesController {
   remove(@Param('id') id: string) {
     return this.incomesService.remove(+id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/latest-incomes')
+  getLatestIncomes(@Param('id') id: string) {
+    return this.incomesService.getLatestIncomes(+id);
+  }
 }

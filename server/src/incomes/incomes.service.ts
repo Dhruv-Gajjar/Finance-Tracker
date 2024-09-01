@@ -16,10 +16,10 @@ export class IncomesService {
     return await this.prismaService.expenses.findMany({});
   }
 
-  async findIncomeByUserId(id: number) {
+  async findIncomeByUserId(userId: number) {
     return await this.prismaService.incomes.findMany({
       where: {
-        userId: id,
+        userId,
       },
     });
   }
@@ -39,5 +39,19 @@ export class IncomesService {
         id,
       },
     });
+  }
+
+  async getLatestIncomes(userId: number) {
+    const incomeData = await this.prismaService.incomes.findMany({
+      where: {
+        userId,
+      },
+      take: 5,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return incomeData;
   }
 }

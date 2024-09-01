@@ -4,6 +4,14 @@ export type IAuthForm = {
   email: string;
 };
 
+export interface IUser {
+  id?: number;
+  userId?: number;
+  username: string;
+  email: string;
+  password?: string;
+}
+
 export interface ICustomCategoryForm {
   name: string;
   icon: string;
@@ -19,6 +27,8 @@ export interface IIncomeExpenseForm {
   categoryId: number;
   userId: number;
   token?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export enum Types {

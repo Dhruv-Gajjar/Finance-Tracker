@@ -7,9 +7,10 @@
     {
       "type": "msedge",
       "request": "launch",
-      "name": "Launch Chrome against localhost",
-      "url": "http://localhost:3000/",
-      "webRoot": "${workspaceFolder}"
+      "name": "Run Edge",
+      "url": "http://localhost:3000/login",
+      "webRoot": "${workspaceFolder}/client/",
+      "resolveSourceMapLocations": ["${workspaceFolder}/", "!/node_modules/**"]
     }
   ]
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { IIncomeExpenseForm } from "@/utils/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { UtensilsCrossed } from "lucide-react";
 import { DetailedHTMLProps, HTMLAttributes } from "react";
@@ -25,7 +26,7 @@ enum ExpenseTypes {
   food,
 }
 
-export const columns: ColumnDef<Expenses>[] = [
+export const columns: ColumnDef<IIncomeExpenseForm>[] = [
   {
     accessorKey: "title",
     header: "Title",
