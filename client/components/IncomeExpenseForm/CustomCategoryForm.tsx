@@ -32,13 +32,11 @@ const CustomCategoryForm: FC<CustomCategoryFormProps> = ({ type }) => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  console.log("USERRR", user);
   const { status, error, mutate } = useMutation({
     mutationFn: createCustomCategory,
     onSuccess: (newCategory) => {
       queryClient.setQueryData(["custom-category"], newCategory);
       console.log("NEW_CAT: ", newCategory);
-      form.reset();
       toast({
         value: "default",
         title: "Category created succesfully!",
@@ -58,16 +56,13 @@ const CustomCategoryForm: FC<CustomCategoryFormProps> = ({ type }) => {
     data: ICustomCategoryForm
   ) => {
     mutate({
-      name: data?.name,
+      name: data?.categoryName,
       icon: data?.icon,
       categoryType: type,
       userId: user?.id!,
     });
-  };
-
-  const handleSubmit = (event: React.FormEvent) => {
-    event.stopPropagation();
-    form.handleSubmit(onSubmit)(event);
+    form.setValue("categoryName", "");
+    form.setValue("icon", "");
   };
 
   if (status === "error") {
@@ -77,15 +72,15 @@ const CustomCategoryForm: FC<CustomCategoryFormProps> = ({ type }) => {
   return (
     <div className="grid gap-4 py-4">
       <Form {...form}>
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
             control={form.control}
-            name="name"
+            name="categoryName"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input defaultValue={""} {...field} />
+                  <Input {...field} />
                 </FormControl>
                 <FormDescription>
                   Transaction description (optional)

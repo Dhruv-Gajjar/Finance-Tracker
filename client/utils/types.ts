@@ -13,7 +13,7 @@ export interface IUser {
 }
 
 export interface ICustomCategoryForm {
-  name: string;
+  categoryName: string;
   icon: string;
 }
 
