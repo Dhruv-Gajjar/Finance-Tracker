@@ -105,23 +105,20 @@ const Sidebar: FC<{ children: ReactNode }> = ({ children }) => {
                   className={
                     pathName === "/dashboard" ? activeClass : linkClass
                   }
-                  onClick={openChange}
                 >
                   <Home className="h-4 w-4" />
                   Dashboard
                 </Link>
                 <Link
-                  href="/incomes"
-                  className={pathName === "/incomes" ? activeClass : linkClass}
-                  onClick={openChange}
+                  href="/income"
+                  className={pathName === "/income" ? activeClass : linkClass}
                 >
-                  <DollarSign className="h-4 w-4" />
+                  <Banknote className="h-4 w-4" />
                   Incomes
                 </Link>
                 <Link
-                  href="/expenses"
-                  className={pathName === "/expenses" ? activeClass : linkClass}
-                  onClick={openChange}
+                  href="/expense"
+                  className={pathName === "/expense" ? activeClass : linkClass}
                 >
                   <DollarSign className="h-4 w-4" />
                   Expenses
@@ -131,7 +128,6 @@ const Sidebar: FC<{ children: ReactNode }> = ({ children }) => {
                   className={
                     pathName === "/transactions" ? activeClass : linkClass
                   }
-                  onClick={openChange}
                 >
                   <CreditCard className="h-4 w-4" />
                   Transactions{" "}

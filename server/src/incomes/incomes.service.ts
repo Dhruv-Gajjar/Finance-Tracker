@@ -17,11 +17,13 @@ export class IncomesService {
   }
 
   async findIncomeByUserId(userId: number) {
-    return await this.prismaService.incomes.findMany({
-      where: {
-        userId,
-      },
-    });
+    if (userId) {
+      return await this.prismaService.incomes.findMany({
+        where: {
+          userId,
+        },
+      });
+    }
   }
 
   async update(id: number, updateIncomeDto: Prisma.IncomesUpdateInput) {
@@ -42,16 +44,18 @@ export class IncomesService {
   }
 
   async getLatestIncomes(userId: number) {
-    const incomeData = await this.prismaService.incomes.findMany({
-      where: {
-        userId,
-      },
-      take: 5,
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    if (userId) {
+      const incomeData = await this.prismaService.incomes.findMany({
+        where: {
+          userId,
+        },
+        take: 5,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
 
-    return incomeData;
+      return incomeData;
+    }
   }
 }
