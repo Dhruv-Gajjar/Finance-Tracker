@@ -1,0 +1,12 @@
+# FrontEnd
+☐ Update the state to use zustand 
+☐ Update the fetch req to use tanstack query 
+☐ Make an API request to fetch and show the chart data on the dashboard
+☐ Add SignIn with Google, Apple using NextAuth
+☐ Test and Fix the Auth Flow if it is working correctly 
+☐ Test the refresh token is working or not
+p
+# BackEnd
+✔ Create a route for chart-data and send the chart data to front-end @done(25-03-14 19:49)
+☐ Test the refresh token logic is working or not
+☐ Try to integrate signin with google and apple

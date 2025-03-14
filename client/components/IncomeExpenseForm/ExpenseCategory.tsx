@@ -1,6 +1,11 @@
-import { CustomCategory } from "@/utils/types";
+import { ICustomCategory, IIncomeExpenseForm } from "@/utils/types";
+import { register } from "module";
 import React, { FC } from "react";
-import { FieldErrors } from "react-hook-form";
+import {
+  ControllerRenderProps,
+  FieldErrors,
+  UseFormRegister,
+} from "react-hook-form";
 import {
   Select,
   SelectContent,
@@ -15,18 +20,32 @@ interface ExpenseCategoryProps {
   value: string;
   onChange: (value: string) => void;
   errors: FieldErrors<any>;
-  expenses: CustomCategory[];
+  // isSubmitted: boolean;
+
+  // onChange: (value: string) => void;
+  expenses: ICustomCategory[];
+  // errors: FieldErrors<IIncomeExpenseForm>;
+  // value: string;
+  // isSubmitted: boolean;
+  // register: UseFormRegister<IIncomeExpenseForm>;
 }
 
 const ExpenseCategory: FC<ExpenseCategoryProps> = ({
-  errors,
+  // errors,
   expenses,
-  onChange,
   value,
+  onChange,
+  // field,
+  // register,
 }) => {
   return (
     <div>
-      <Select onValueChange={onChange} value={value}>
+      <Select
+        // {...field}
+        // {...(register("category"), { required: true })}
+        onValueChange={onChange}
+        value={value}
+      >
         <SelectTrigger>
           <SelectValue placeholder="Select a expense type" />
         </SelectTrigger>
@@ -35,7 +54,7 @@ const ExpenseCategory: FC<ExpenseCategoryProps> = ({
             <SelectLabel>Expense Types</SelectLabel>
             {expenses?.length > 0 ? (
               expenses?.map(
-                (expense: CustomCategory) =>
+                (expense: ICustomCategory) =>
                   expense.categoryType === "expense" && (
                     <SelectItem
                       key={expense?.id}
@@ -52,9 +71,9 @@ const ExpenseCategory: FC<ExpenseCategoryProps> = ({
             )}
           </SelectGroup>
         </SelectContent>
-        {errors.type?.type === "required" && (
+        {/* {errors.type?.type === "required" && (
           <p className="text-red-400">Expense Category is required</p>
-        )}
+        )} */}
       </Select>
     </div>
   );

@@ -21,7 +21,7 @@ export interface IIncomeExpenseForm {
   title: string;
   description?: string;
   amount: number;
-  date: string;
+  date: Date | undefined;
   type: string;
   category?: string;
   categoryId: number;
@@ -74,7 +74,7 @@ export type Expenses = {
   amount: number;
 };
 
-export interface CustomCategory {
+export interface ICustomCategory {
   id?: number;
   name: string;
   icon: string;

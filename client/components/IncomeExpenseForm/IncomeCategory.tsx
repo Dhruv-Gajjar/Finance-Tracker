@@ -1,6 +1,11 @@
-import { CustomCategory } from "@/utils/types";
-import React, { FC } from "react";
-import { FieldErrors } from "react-hook-form";
+import { ICustomCategory, IIncomeExpenseForm } from "@/utils/types";
+import { register } from "module";
+import React, { FC, useEffect } from "react";
+import {
+  ControllerRenderProps,
+  FieldErrors,
+  UseFormRegister,
+} from "react-hook-form";
 import {
   Select,
   SelectContent,
@@ -12,10 +17,13 @@ import {
 } from "../ui/select";
 
 interface IncomeCategoryProps {
-  value: string;
   onChange: (value: string) => void;
-  errors: FieldErrors<any>;
-  incomes: CustomCategory[];
+  errors: FieldErrors<IIncomeExpenseForm>;
+  incomes: ICustomCategory[];
+  value: string;
+  // isSubmitted: boolean;
+  // incomeField: any;
+  // incomeRegister: UseFormRegister<IIncomeExpenseForm>;
 }
 
 const IncomeCategory: FC<IncomeCategoryProps> = ({
@@ -23,6 +31,9 @@ const IncomeCategory: FC<IncomeCategoryProps> = ({
   incomes,
   onChange,
   value,
+  // isSubmitted,
+  // incomeRegister,
+  // incomeField,
 }) => {
   return (
     <div>
@@ -35,7 +46,7 @@ const IncomeCategory: FC<IncomeCategoryProps> = ({
             <SelectLabel>Income Types</SelectLabel>
             {incomes?.length > 0 ? (
               incomes?.map(
-                (income: CustomCategory) =>
+                (income: ICustomCategory) =>
                   income.categoryType === "income" && (
                     <SelectItem
                       key={income?.id}
@@ -52,8 +63,8 @@ const IncomeCategory: FC<IncomeCategoryProps> = ({
             )}
           </SelectGroup>
         </SelectContent>
-        {errors.type?.type === "required" && (
-          <p className="text-red-400">Income Category is required</p>
+        {errors.category?.message && (
+          <p className="text-red-400">{errors.category.message}</p>
         )}
       </Select>
     </div>

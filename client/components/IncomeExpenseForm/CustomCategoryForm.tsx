@@ -17,7 +17,7 @@ import Picker from "@emoji-mart/react";
 import { PopoverContent } from "@radix-ui/react-popover";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CircleOff } from "lucide-react";
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import { SubmitHandler, useForm, UseFormReset } from "react-hook-form";
 import { DialogClose, DialogFooter } from "../ui/dialog";
 import { useToast } from "../ui/use-toast";
@@ -117,7 +117,7 @@ const CustomCategoryForm: FC<CustomCategoryFormProps> = ({ type }) => {
                         )}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-full">
+                    <PopoverContent className="w-full mx-auto absolute bottom-[-25px] right-44">
                       <Picker
                         data={data}
                         onEmojiSelect={(emoji: { native: string }) => {

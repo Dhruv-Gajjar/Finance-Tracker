@@ -13,7 +13,7 @@ export class IncomesService {
   }
 
   async findAll() {
-    return await this.prismaService.expenses.findMany({});
+    return await this.prismaService.incomes.findMany({});
   }
 
   async findIncomeByUserId(userId: number) {

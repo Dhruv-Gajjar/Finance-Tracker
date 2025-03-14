@@ -41,11 +41,12 @@ export const AuthContextProvider = (props: { children: ReactNode }) => {
   const router = useRouter();
 
   const { data: userData } = useQuery({
-    queryKey: ["users"],
+    queryKey: ["users", [user?.userId]],
     queryFn: async () => {
-      await getUserById(user?.userId!, token);
-      // setUser(userData);
+      const tempUser = await getUserById(user?.userId, token);
+      setUser(tempUser);
       console.log("User", user);
+      return tempUser;
     },
   });
 
@@ -53,7 +54,7 @@ export const AuthContextProvider = (props: { children: ReactNode }) => {
     if (token) {
       getUser();
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     const tokenExpired = checkTokenExpiration(token);
@@ -70,26 +71,31 @@ export const AuthContextProvider = (props: { children: ReactNode }) => {
     }
   }, []);
 
-  const login = useCallback(async (data: IUser): Promise<void> => {
-    const loginData = await post("/auth/login", data);
-    if (loginData?.status !== 200) {
-      toast({
-        variant: "destructive",
-        title: loginData?.response?.data?.message,
-      });
-    } else {
-      const userObj = {
-        userId: loginData?.response?.id,
-        username: loginData?.response?.username,
-        email: loginData?.response?.email,
-      };
-      setUser(loginData?.response);
-      setToken(loginData?.response?.token);
-      localStorage.setItem("token", loginData?.response?.token);
-      localStorage.setItem("refreshToken", loginData?.response?.refreshToken);
-      localStorage.setItem("user", JSON.stringify(userObj));
-    }
-  }, []);
+  const login = useCallback(
+    async (data: IUser): Promise<void> => {
+      const loginData = await post("/auth/login", data);
+      try {
+        const userObj = {
+          userId: loginData?.response?.id,
+          username: loginData?.response?.username,
+          email: loginData?.response?.email,
+        };
+        setUser(loginData?.response);
+        setToken(loginData?.response?.token);
+        localStorage.setItem("token", loginData?.response?.token);
+        localStorage.setItem("refreshToken", loginData?.response?.refreshToken);
+        localStorage.setItem("user", JSON.stringify(userObj));
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: loginData?.response?.data?.message,
+        });
+      } finally {
+        router.push("/");
+      }
+    },
+    [router]
+  );
 
   // const { status, error, mutate } = useMutation({
   //   mutationFn: login,
@@ -146,7 +152,9 @@ export const AuthContextProvider = (props: { children: ReactNode }) => {
 
   const logout = useCallback(() => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setToken("");
+    setUser(null);
   }, []);
 
   const getUser = async () => {

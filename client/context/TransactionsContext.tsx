@@ -8,6 +8,7 @@ import {
   Dispatch,
   ReactNode,
   SetStateAction,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -41,15 +42,17 @@ export const TransactionContextProvider = (props: { children: ReactNode }) => {
       const incomes = await getAllIncomes(token, user?.id!);
       console.log("IncomeData: ", incomes);
       setIncomes(incomes);
+      return incomes;
     },
   });
 
-  useQuery({
+  const { data: latestIncome } = useQuery({
     queryKey: ["latest-incomes"],
     queryFn: async () => {
       const latestIncomes = await getLatestIncomes(token, user?.id!);
-      console.log("Latest-Incomes: ", latestIncomes);
+      console.log("Latest-Incomes: ", latestIncome);
       setLatestIncomes(latestIncomes);
+      return latestIncomes;
     },
   });
 
@@ -60,31 +63,36 @@ export const TransactionContextProvider = (props: { children: ReactNode }) => {
       const allExpenses = await getAllExpenses(token, user?.id!);
       console.log("All-Expenses: ", allExpenses);
       setExpenses(allExpenses);
+      return allExpenses;
     },
   });
 
-  useQuery({
+  const { data: latestExpense } = useQuery({
     queryKey: ["latest-expenses"],
     queryFn: async () => {
       const latestExpenses = await getLatestExpenses(token, user?.id!);
-      console.log("Latest-Expenses: ", latestExpenses);
-      setLatestExpenses(latestExpenses);
+      console.log("Latest-Expenses: ", latestExpense);
+      setLatestExpenses(latestIncomes);
+      return latestExpenses;
     },
   });
 
-  const filterTransactionByDate = () => {
+  const filterTransactionByDate = useCallback(() => {
     const latestTransation = [...latestIncomes, ...latestExpenses];
     const sortedTransaction = latestTransation
       ?.sort((a: IIncomeExpenseForm, b: IIncomeExpenseForm) => {
-        return new Date(b?.createdAt) - new Date(a?.createdAt);
+        const dateA = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
       })
       .slice(0, 5);
     setLatestTransaction(sortedTransaction);
-  };
+    return sortedTransaction;
+  }, [latestIncomes, latestExpenses]);
 
   useEffect(() => {
     filterTransactionByDate();
-  }, [latestIncomes, latestExpenses]);
+  }, [latestIncomes, latestExpenses, filterTransactionByDate]);
 
   const currentValues = useMemo(
     () => ({
@@ -92,11 +100,13 @@ export const TransactionContextProvider = (props: { children: ReactNode }) => {
       setIncomes,
       expenses,
       setExpenses,
-      latestIncomes,
-      latestExpenses,
+      // latestIncomes,
+      latestIncome,
+      // latestExpenses,
+      latestExpense,
       latestTransactions,
     }),
-    [incomes, expenses, latestIncomes, latestExpenses, latestTransactions]
+    [incomes, expenses, latestIncome, latestExpense, latestTransactions]
   );
 
   return (
@@ -107,11 +117,11 @@ export const TransactionContextProvider = (props: { children: ReactNode }) => {
 };
 
 export const useTransaction = () => {
-  const incomeContext = useContext(TransactionContext);
+  const incomeExpenseContext = useContext(TransactionContext);
 
-  if (incomeContext == null) {
+  if (incomeExpenseContext == null) {
     throw new Error("Transaction Context Not Found!");
   }
 
-  return incomeContext;
+  return incomeExpenseContext;
 };

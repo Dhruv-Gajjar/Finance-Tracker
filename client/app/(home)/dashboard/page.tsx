@@ -7,20 +7,23 @@ import Chart from "@/components/Chart/Chart";
 import { columns } from "@/components/DataTable/columns";
 import useAuth from "@/context/AuthContext";
 import { useTransaction } from "@/context/TransactionsContext";
+import { IIncomeExpenseForm } from "@/utils/types";
+import { redirect } from "next/navigation";
 
 const Dashboard = () => {
-  const { user } = useAuth();
-  const { latestTransactions } = useTransaction();
-  const [tempUser, setTempUser] = useState<any>(null);
+  const { user, token } = useAuth();
+  const { latestTransactions, incomes, expenses } = useTransaction();
+  const chartData: IIncomeExpenseForm[] = [];
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const user = localStorage.getItem("user");
-      if (user) {
-        setTempUser(JSON.parse(user));
+      if (!user && !token) {
+        console.log("TOKEN: ", token);
+        redirect("/login");
       }
     }
-  }, []);
+    console.log("HEREEE");
+  }, [token, user]);
 
   return (
     <div className="flex flex-col items-center justify-between p-8 h-full bg-gray-200 dark:bg-zinc-900">
@@ -40,10 +43,10 @@ const Dashboard = () => {
         />
         <TotalAmount title="Total Spent" amount={10000} color="text-red-600" />
       </div>
-      <div className="w-fit md:w-full">
-        {/* <Chart expenseData={latestTransactions} /> */}
-      </div>
-      <div className="w-fit md:w-full h-full">
+      <div className="w-full grid md:grid-cols-2 items-center justify-between h-full gap-4">
+        <Chart chartData={chartData} />
+        {/* </div> */}
+        {/* <div className="w-fit md:w-full h-full"> */}
         <DataTable columns={columns} data={latestTransactions} />
       </div>
     </div>

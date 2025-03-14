@@ -36,7 +36,7 @@ const Sidebar: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <div className="sticky grid h-[100vh] w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       {/* Medium screen sidebar */}
-      <div className="hidden border-r bg-muted/40 md:block">
+      <div className="hidden border-r bg-muted/40 md:block h-[80%]">
         <div className="flex h-full min-h-screen flex-col gap-2 bg-white shadow-md dark:bg-zinc-950">
           <div className="flex justify-between h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold">
@@ -79,10 +79,15 @@ const Sidebar: FC<{ children: ReactNode }> = ({ children }) => {
               </Link>
             </nav>
           </div>
-          <div className="px-2 pb-4">
-            <Button variant="ghost" className="self-start" onClick={logout}>
+          <hr className="divide-y-8 divide-gray-50" />
+          <div className="px-2 pb-4 w-full mx-auto">
+            <Button
+              variant="ghost"
+              className="w-full mx-auto space-x-2"
+              onClick={logout}
+            >
+              <span>Logout</span>
               <LogOutIcon className="h-4 w-4" />
-              <span className="ml-2">Logout</span>
             </Button>
           </div>
         </div>

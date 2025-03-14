@@ -1,8 +1,8 @@
-import { ExpenseTypes, Expenses } from "./types";
+import { IIncomeExpenseForm } from "./types";
 
 export function calculateTotalExpenseByType(
-  expenseData: Expenses[],
-  expenseType: ExpenseTypes
+  expenseData: IIncomeExpenseForm[],
+  expenseType: string
 ) {
   return expenseData.reduce((total, expense) => {
     if (expense.type === expenseType) {
