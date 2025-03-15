@@ -21,7 +21,7 @@ export const post = async (
 ) => {
   try {
     const response = await axiosInstance.post(url, data, config);
-    return response.data;
+    return response;
   } catch (error: any) {
     return error;
   }

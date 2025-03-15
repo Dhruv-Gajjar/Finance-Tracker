@@ -1,14 +1,16 @@
 "use client";
 import { toast } from "@/components/ui/use-toast";
-// import { login } from "@/services/auth.service";
 import { getUserById } from "@/services/userService.service";
+import useGlobalStore from "@/store/GlobalStore";
 import { get, post } from "@/utils/axiosService";
 import { checkTokenExpiration } from "@/utils/checkTokenExpiration";
-import { IUser } from "@/utils/types";
+import { IUser, IUserFormData } from "@/utils/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
 import { useRouter } from "next/navigation";
 import {
   Dispatch,
+  FC,
   ReactNode,
   SetStateAction,
   createContext,
@@ -20,46 +22,30 @@ import {
 } from "react";
 
 interface IAuthContext {
-  user: IUser | null;
-  token: string;
-  setToken: Dispatch<SetStateAction<string>>;
-  login: (data: IUser) => Promise<void>;
-  signUp: (data: IUser) => Promise<void>;
+  token: string | null;
+  login: (data: IUserFormData) => Promise<void>;
+  signUp: (data: IUserFormData) => Promise<void>;
   logout: () => void;
+}
+
+interface AuthProviderProps {
+  children: ReactNode;
 }
 
 export const AuthContext = createContext<IAuthContext | null>(null);
 
-export const AuthContextProvider = (props: { children: ReactNode }) => {
-  const { children } = props;
+export const AuthContextProvider: FC<AuthProviderProps> = ({ children }) => {
+  const { login: storeLogin, logout: storeLogout, token } = useGlobalStore();
   const queryClient = useQueryClient();
 
-  const [user, setUser] = useState<IUser | null>(null);
-  const [token, setToken] = useState<string>(
-    typeof window !== "undefined" ? localStorage.getItem("token") || "" : ""
-  );
   const router = useRouter();
-
-  const { data: userData } = useQuery({
-    queryKey: ["users", [user?.userId]],
-    queryFn: async () => {
-      const tempUser = await getUserById(user?.userId, token);
-      setUser(tempUser);
-      console.log("User", user);
-      return tempUser;
-    },
-  });
 
   useEffect(() => {
     if (token) {
-      getUser();
-    }
-  }, [token]);
-
-  useEffect(() => {
-    const tokenExpired = checkTokenExpiration(token);
-    if (tokenExpired) {
-      refreshToken();
+      const tokenExpired = checkTokenExpiration(token);
+      if (tokenExpired) {
+        refreshToken();
+      }
     }
   }, [token]);
 
@@ -72,73 +58,23 @@ export const AuthContextProvider = (props: { children: ReactNode }) => {
   }, []);
 
   const login = useCallback(
-    async (data: IUser): Promise<void> => {
-      const loginData = await post("/auth/login", data);
-      try {
-        const userObj = {
-          userId: loginData?.response?.id,
-          username: loginData?.response?.username,
-          email: loginData?.response?.email,
-        };
-        setUser(loginData?.response);
-        setToken(loginData?.response?.token);
-        localStorage.setItem("token", loginData?.response?.token);
-        localStorage.setItem("refreshToken", loginData?.response?.refreshToken);
-        localStorage.setItem("user", JSON.stringify(userObj));
-      } catch (error) {
+    async (userData: IUserFormData): Promise<void> => {
+      const loginData: AxiosResponse = await post("/auth/login", userData);
+      if (loginData.status === 200 && loginData.data) {
+        console.log("LoginData: ", loginData.data);
+        storeLogin(loginData.data.response);
+        router.push("/dashboard");
+      } else {
         toast({
           variant: "destructive",
-          title: loginData?.response?.data?.message,
+          title: loginData.data.message,
         });
-      } finally {
-        router.push("/");
       }
     },
-    [router]
+    [router, storeLogin]
   );
 
-  // const { status, error, mutate } = useMutation({
-  //   mutationFn: login,
-  //   onSuccess: (loginData) => {
-  //     queryClient.setQueryData(["login"], loginData);
-  //     console.log("LOGIIN: ", loginData);
-  //     toast({
-  //       value: "default",
-  //       title: "User Logged in!",
-  //       className: "bg-green-600",
-  //     });
-  //   },
-  //   onError: (error) => {
-  //     toast({
-  //       value: "warning",
-  //       title: "Login Failed Try Again!",
-  //       className: "bg-red-600",
-  //     });
-  //   },
-  // });
-
-  // const login = async (data: IUser): Promise<void> => {
-  //   const loginData = await post("/auth/login", data);
-  //   if (loginData?.status !== 200) {
-  //     toast({
-  //       variant: "destructive",
-  //       title: loginData?.response?.data?.message,
-  //     });
-  //   } else {
-  //     const userObj = {
-  //       userId: loginData?.response?.id,
-  //       username: loginData?.response?.username,
-  //       email: loginData?.response?.email,
-  //     };
-  //     setUser(loginData?.response);
-  //     setToken(loginData?.response?.token);
-  //     localStorage.setItem("token", loginData?.response?.token);
-  //     localStorage.setItem("refreshToken", loginData?.response?.refreshToken);
-  //     localStorage.setItem("user", JSON.stringify(userObj));
-  //   }
-  // };
-
-  const signUp = useCallback(async (data: IUser) => {
+  const signUp = useCallback(async (data: IUserFormData) => {
     const signUpData = await post("auth/register", data);
     if (signUpData?.status !== 200) {
       return toast({
@@ -151,36 +87,9 @@ export const AuthContextProvider = (props: { children: ReactNode }) => {
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setToken("");
-    setUser(null);
-  }, []);
-
-  const getUser = async () => {
-    let userData;
-    const userString = localStorage.getItem("user");
-    let user = null;
-
-    if (userString !== null) {
-      user = JSON.parse(userString);
-    }
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
-    };
-    if (user?.userId) {
-      userData = await get(`users/${user?.userId}`, config);
-    }
-    if (userData?.status === 200 && userData !== null) {
-      setUser(userData?.response);
-    } else {
-      toast({
-        variant: "destructive",
-        title: "User not found",
-      });
-      // router.push("/signup");
-    }
-  };
+    storeLogout();
+    router.push("/login");
+  }, [storeLogout, router]);
 
   const refreshToken = async () => {
     const tempRefreshToken = localStorage.getItem("refreshToken");
@@ -190,7 +99,7 @@ export const AuthContextProvider = (props: { children: ReactNode }) => {
       });
       if (refreshTokenData.status === 200) {
         localStorage.removeItem("token");
-        setToken(refreshTokenData?.access_token);
+        // setToken(refreshTokenData?.access_token);
         localStorage.setItem("token", refreshTokenData?.access_token);
         toast({
           title: refreshTokenData?.message,
@@ -207,14 +116,12 @@ export const AuthContextProvider = (props: { children: ReactNode }) => {
 
   const currentValues = useMemo(
     () => ({
-      user,
       token,
-      setToken,
       login,
       signUp,
       logout,
     }),
-    [user, token, setToken, login, signUp, logout]
+    [token, login, signUp, logout]
   );
 
   return (

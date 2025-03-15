@@ -6,5 +6,5 @@ export const login = async (userData: IUser) => {
     `${process.env.NEXT_PUBLIC_BASE_URL}/login`,
     userData
   );
-  return response.data;
+  return response;
 };

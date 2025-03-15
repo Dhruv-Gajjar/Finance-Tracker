@@ -1,15 +1,23 @@
-export type IAuthForm = {
+export type IUserFormData = {
   username: string;
   password: string;
   email: string;
 };
 
+// export interface IUserFormData {
+//   id?: number;
+//   userId?: number;
+//   username: string;
+//   email: string;
+//   password?: string;
+// }
+
 export interface IUser {
-  id?: number;
-  userId?: number;
+  id: number;
   username: string;
   email: string;
-  password?: string;
+  token: string;
+  refreshToken: string;
 }
 
 export interface ICustomCategoryForm {

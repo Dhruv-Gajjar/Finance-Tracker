@@ -7,28 +7,19 @@ import Chart from "@/components/Chart/Chart";
 import { columns } from "@/components/DataTable/columns";
 import useAuth from "@/context/AuthContext";
 import { useTransaction } from "@/context/TransactionsContext";
+import useGlobalStore from "@/store/GlobalStore";
 import { IIncomeExpenseForm } from "@/utils/types";
 import { redirect } from "next/navigation";
 
 const Dashboard = () => {
-  const { user, token } = useAuth();
+  const { username } = useGlobalStore();
   const { latestTransactions, incomes, expenses } = useTransaction();
   const chartData: IIncomeExpenseForm[] = [];
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      if (!user && !token) {
-        console.log("TOKEN: ", token);
-        redirect("/login");
-      }
-    }
-    console.log("HEREEE");
-  }, [token, user]);
 
   return (
     <div className="flex flex-col items-center justify-between p-8 h-full bg-gray-200 dark:bg-zinc-900">
       <div className="self-start text-2xl text-foreground p-6">
-        <p className="capitalize">Hello, {user?.username} &#x1F44B;</p>
+        <p className="capitalize">Hello, {username} &#x1F44B;</p>
       </div>
       <div className="flex items-center justify-start flex-col w-full gap-4 md:flex-row">
         <TotalAmount

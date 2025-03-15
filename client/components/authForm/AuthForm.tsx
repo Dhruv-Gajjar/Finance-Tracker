@@ -1,5 +1,5 @@
 "use client";
-import { IAuthForm } from "@/utils/types";
+import { IUserFormData } from "@/utils/types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -28,13 +28,12 @@ const AuthForm = (props: { title: string }) => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<IAuthForm>();
+  } = useForm<IUserFormData>();
 
-  const onSubmit: SubmitHandler<IAuthForm> = async (formData) => {
+  const onSubmit: SubmitHandler<IUserFormData> = async (formData) => {
     try {
       if (title === "Login") {
         login(formData);
-        router.push("/");
       } else {
         signUp(formData);
         toast({
