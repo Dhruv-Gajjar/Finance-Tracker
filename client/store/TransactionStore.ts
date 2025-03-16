@@ -6,6 +6,10 @@ interface IIncomeStore {
   incomes: IIncomeExpenseForm[];
   addIncome: (income: IIncomeExpenseForm) => void;
   setIncomeData: (income: IIncomeExpenseForm[]) => void;
+
+  // expenses: IIncomeExpenseForm[];
+  // addExpense: (income: IIncomeExpenseForm) => void;
+  // setExpenseData: (income: IIncomeExpenseForm[]) => void;
 }
 
 const useTransactionStore = create<IIncomeStore>()(

@@ -1,6 +1,8 @@
 "use client";
 import { getAllExpenses, getLatestExpenses } from "@/services/expense.service";
 import { getAllIncomes, getLatestIncomes } from "@/services/income.service";
+import useGlobalStore from "@/store/GlobalStore";
+import useTransactionStore from "@/store/TransactionStore";
 import { IIncomeExpenseForm } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -17,8 +19,6 @@ import {
 import useAuth from "./AuthContext";
 
 interface ITransactionContext {
-  incomes: IIncomeExpenseForm[];
-  setIncomes: Dispatch<SetStateAction<IIncomeExpenseForm[]>>;
   expenses: IIncomeExpenseForm[];
   setExpenses: Dispatch<SetStateAction<IIncomeExpenseForm[]>>;
   latestTransactions: IIncomeExpenseForm[];
@@ -27,8 +27,9 @@ interface ITransactionContext {
 const TransactionContext = createContext<ITransactionContext | null>(null);
 
 export const TransactionContextProvider = (props: { children: ReactNode }) => {
-  const { user, token } = useAuth();
-  const [incomes, setIncomes] = useState<IIncomeExpenseForm[]>([]);
+  const { token, userId } = useGlobalStore();
+  const { setIncomeData } = useTransactionStore();
+  // const [incomes, setIncomes] = useState<IIncomeExpenseForm[]>([]);
   const [expenses, setExpenses] = useState<IIncomeExpenseForm[]>([]);
   const [latestIncomes, setLatestIncomes] = useState([]);
   const [latestExpenses, setLatestExpenses] = useState([]);
@@ -39,9 +40,14 @@ export const TransactionContextProvider = (props: { children: ReactNode }) => {
   useQuery({
     queryKey: ["incomes"],
     queryFn: async () => {
-      const incomes = await getAllIncomes(token, user?.id!);
-      console.log("IncomeData: ", incomes);
-      setIncomes(incomes);
+      let incomes: IIncomeExpenseForm[] = [];
+      if (token && userId) {
+        incomes = await getAllIncomes(token, userId);
+        console.log("IncomeData: ", incomes);
+        setIncomeData(incomes);
+      } else {
+        console.log("No Token or User Found...");
+      }
       return incomes;
     },
   });
@@ -49,9 +55,11 @@ export const TransactionContextProvider = (props: { children: ReactNode }) => {
   const { data: latestIncome } = useQuery({
     queryKey: ["latest-incomes"],
     queryFn: async () => {
-      const latestIncomes = await getLatestIncomes(token, user?.id!);
-      console.log("Latest-Incomes: ", latestIncome);
-      setLatestIncomes(latestIncomes);
+      if (token && userId) {
+        const latestIncomes = await getLatestIncomes(token, userId);
+        console.log("Latest-Incomes: ", latestIncome);
+        setLatestIncomes(latestIncomes);
+      }
       return latestIncomes;
     },
   });
@@ -60,19 +68,23 @@ export const TransactionContextProvider = (props: { children: ReactNode }) => {
   useQuery({
     queryKey: ["expenses"],
     queryFn: async () => {
-      const allExpenses = await getAllExpenses(token, user?.id!);
-      console.log("All-Expenses: ", allExpenses);
-      setExpenses(allExpenses);
-      return allExpenses;
+      if (token && userId) {
+        const allExpenses = await getAllExpenses(token, userId);
+        console.log("All-Expenses: ", allExpenses);
+        setExpenses(allExpenses);
+        return allExpenses;
+      }
     },
   });
 
   const { data: latestExpense } = useQuery({
     queryKey: ["latest-expenses"],
     queryFn: async () => {
-      const latestExpenses = await getLatestExpenses(token, user?.id!);
-      console.log("Latest-Expenses: ", latestExpense);
-      setLatestExpenses(latestIncomes);
+      if (token && userId) {
+        const latestExpenses = await getLatestExpenses(token, userId);
+        console.log("Latest-Expenses: ", latestExpense);
+        setLatestExpenses(latestIncomes);
+      }
       return latestExpenses;
     },
   });
@@ -96,8 +108,6 @@ export const TransactionContextProvider = (props: { children: ReactNode }) => {
 
   const currentValues = useMemo(
     () => ({
-      incomes,
-      setIncomes,
       expenses,
       setExpenses,
       // latestIncomes,
@@ -106,7 +116,7 @@ export const TransactionContextProvider = (props: { children: ReactNode }) => {
       latestExpense,
       latestTransactions,
     }),
-    [incomes, expenses, latestIncome, latestExpense, latestTransactions]
+    [expenses, latestIncome, latestExpense, latestTransactions]
   );
 
   return (

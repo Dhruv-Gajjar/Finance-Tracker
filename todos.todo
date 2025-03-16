@@ -3,7 +3,7 @@
 ☐ Update the fetch req to use tanstack query 
 ☐ Make an API request to fetch and show the chart data on the dashboard
 ☐ Add SignIn with Google, Apple using NextAuth
-☐ Test and Fix the Auth Flow if it is working correctly 
+✔ Test and Fix the Auth Flow if it is working correctly @done(25-03-15 11:20)
 ☐ Test the refresh token is working or not
 p
 # BackEnd
