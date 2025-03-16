@@ -10,3 +10,4 @@ p
 ✔ Create a route for chart-data and send the chart data to front-end @done(25-03-14 19:49)
 ☐ Test the refresh token logic is working or not
 ☐ Try to integrate signin with google and apple
+✔ Create a latest transaction endpoint for getting the latest 5 incomes or expenses @done(25-03-16 12:14)

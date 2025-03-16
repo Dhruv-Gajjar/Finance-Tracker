@@ -9,6 +9,7 @@ import { PrismaService } from './db/prisma.service';
 import { ExpensesModule } from './expenses/expenses.module';
 import { IncomesModule } from './incomes/incomes.module';
 import { UsersModule } from './users/users.module';
+import { LatestTransactionModule } from './latest-transaction/latest-transaction.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UsersModule } from './users/users.module';
     IncomesModule,
     CustomCategoryModule,
     ChartDataModule,
+    LatestTransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService, JwtStrategy],
