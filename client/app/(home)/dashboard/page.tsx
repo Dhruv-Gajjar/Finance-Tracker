@@ -7,28 +7,39 @@ import { columns } from "@/components/DataTable/columns";
 import { useTransaction } from "@/context/TransactionsContext";
 import { getAllIncomes } from "@/services/income.service";
 import useGlobalStore from "@/store/GlobalStore";
+import { get } from "@/utils/axiosService";
 import { IIncomeExpenseForm } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
 
 const Dashboard = () => {
-  const { username, token, userId } = useGlobalStore();
+  const { username, userId, token } = useGlobalStore();
   const { latestTransactions, expenses } = useTransaction();
   const chartData: IIncomeExpenseForm[] = [];
 
-  const { data: incomeData, isLoading: isIncomeLoading } = useQuery({
-    queryKey: ["incomes"],
-    queryFn: async () => await getAllIncomes(token!, userId!),
-  });
-
+  const { data: latestTransaction, isLoading: isLatestTransactionLoading } =
+    useQuery({
+      queryKey: ["latest-transactions"],
+      queryFn: async () => {
+        const config = {
+          headers: { Authorization: `Bearer ${token}` },
+        };
+        const latestTransaction = await get(
+          `/latest-transaction/${userId}`,
+          config
+        );
+        return latestTransaction;
+      },
+    });
+  console.log("LatestTransaction: ", latestTransaction);
   return (
     <>
-      {isIncomeLoading && (
+      {isLatestTransactionLoading && (
         <div className="w-full h-[80vh]">
           <p className="text-2xl font-semibold tracking-tight">Loading...</p>
         </div>
       )}
 
-      {incomeData && (
+      {latestTransaction && (
         <div className="flex flex-col items-center justify-between p-8 h-full bg-gray-200 dark:bg-zinc-900">
           <div className="self-start text-2xl text-foreground p-6">
             <p className="capitalize">Hello, {username} &#x1F44B;</p>
