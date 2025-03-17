@@ -5,7 +5,8 @@
 ☐ Add SignIn with Google, Apple using NextAuth
 ✔ Test and Fix the Auth Flow if it is working correctly @done(25-03-15 11:20)
 ☐ Test the refresh token is working or not
-p
+☐ Fix Custom Category not adding
+
 # BackEnd
 ✔ Create a route for chart-data and send the chart data to front-end @done(25-03-14 19:49)
 ☐ Test the refresh token logic is working or not

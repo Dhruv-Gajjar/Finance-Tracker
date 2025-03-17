@@ -78,7 +78,6 @@ interface ChartProps {
 }
 
 const Chart: FC<ChartProps> = ({ chartData }) => {
-  console.log("CHART_DATA: ", chartData);
   return (
     <div className="h-full w-full">
       <ResponsiveContainer width="100%" height={400}>
@@ -91,7 +90,7 @@ const Chart: FC<ChartProps> = ({ chartData }) => {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Bar dataKey="amount" stackId="a" fill="#22C55E" />
+          <Bar dataKey="income" stackId="a" fill="#22C55E" />
           <Bar dataKey="expense" stackId="a" fill="#22C55E" />
         </BarChart>
       </ResponsiveContainer>
